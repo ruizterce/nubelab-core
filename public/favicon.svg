@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NubeLab">
+  <rect width="64" height="64" fill="#090b0e"/>
+  <path d="M12 44V20h8l24 24V20h8v24h-8L20 20v24z" fill="#5ed4ff"/>
+  <path d="M12 52h40" stroke="#44d27f" stroke-width="4"/>
+</svg>

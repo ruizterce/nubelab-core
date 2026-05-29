@@ -1,0 +1,11 @@
+.git
+.github
+.next
+node_modules
+coverage
+docker/.env
+docker/.env.deploy
+*.log
+README.md
+docs
+spec
