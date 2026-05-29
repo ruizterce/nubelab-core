@@ -17,6 +17,7 @@ type AtlasNode = {
   variant: "core" | "author" | "infra" | "lab" | "ops";
   href?: string;
   tags: string[];
+  disabled?: boolean;
 };
 
 type Connection = {
@@ -52,6 +53,7 @@ const atlasNodes: AtlasNode[] = [
     x: 28,
     y: 33,
     variant: "author",
+    disabled: true,
     tags: ["profile", "engineering", "operator"],
   },
   {
@@ -81,6 +83,7 @@ const atlasNodes: AtlasNode[] = [
     x: 72,
     y: 37,
     variant: "lab",
+    disabled: true,
     tags: ["ai", "automation", "experiments"],
   },
   {
@@ -95,6 +98,7 @@ const atlasNodes: AtlasNode[] = [
     x: 35,
     y: 68,
     variant: "ops",
+    disabled: true,
     tags: ["deploy", "health", "security"],
   },
 ];
@@ -258,6 +262,7 @@ export function CloudFactoryAtlas() {
                   styles[node.variant],
                   activeNode.id === node.id ? styles.nodeActive : "",
                   hoveredNodeId === node.id ? styles.nodeHovered : "",
+                  node.disabled ? styles.nodeDisabled : "",
                 ].join(" ")}
                 data-map-control
                 key={node.id}
