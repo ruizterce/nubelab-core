@@ -20,12 +20,12 @@ function CloudPlatform() {
       {/* Main cloud body */}
       <Cloud
         seed={1}
-        position={[0, 0, 0]}
+        position={[0, 3, 2.5]}
         scale={[1, 0.55, 0.65]}
         opacity={0.95}
-        speed={0.12}
-        segments={30}
-        bounds={[3.35, 2.4, 3.5]}
+        speed={0.08}
+        segments={35}
+        bounds={[2.6, 1.8, 2.8]}
         color="#ffffff"
         concentrate="inside"
       />
@@ -33,12 +33,12 @@ function CloudPlatform() {
       {/* Left lobe */}
       <Cloud
         seed={2}
-        position={[-1.2, -0.1, -0.5]}
-        scale={[0.65, 0.4, 0.5]}
-        opacity={0.75}
-        speed={0.1}
-        segments={20}
-        bounds={[2, 1.86, 2.5]}
+        position={[-0.9, 2.9, 2.3]}
+        scale={[0.55, 0.35, 0.4]}
+        opacity={0.7}
+        speed={0.06}
+        segments={22}
+        bounds={[1.6, 1.4, 1.8]}
         color="#ffffff"
         concentrate="inside"
       />
@@ -46,25 +46,12 @@ function CloudPlatform() {
       {/* Right lobe */}
       <Cloud
         seed={3}
-        position={[1.3, 0, -0.4]}
-        scale={[0.7, 0.45, 0.55]}
-        opacity={0.8}
-        speed={0.16}
-        segments={22}
-        bounds={[2.15, 2, 2.8]}
-        color="#ffffff"
-        concentrate="inside"
-      />
-
-      {/* Top puff */}
-      <Cloud
-        seed={4}
-        position={[0.2, 1.3, 0.1]}
-        scale={[0.45, 0.35, 0.4]}
+        position={[0.9, 3, 2.2]}
+        scale={[0.55, 0.35, 0.4]}
         opacity={0.7}
-        speed={0.18}
-        segments={16}
-        bounds={[2, 1.73, 2]}
+        speed={0.06}
+        segments={22}
+        bounds={[1.6, 1.4, 1.8]}
         color="#ffffff"
         concentrate="inside"
       />
@@ -81,8 +68,8 @@ export const CloudCanvas = memo(function CloudCanvas() {
         premultipliedAlpha: true,
       }}
       camera={{
-        position: [0, 0.5, 14],
-        fov: 38,
+        position: [0, 8, 11],
+        fov: 42,
         near: 0.1,
         far: 80,
       }}

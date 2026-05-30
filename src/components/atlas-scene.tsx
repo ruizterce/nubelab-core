@@ -1,19 +1,25 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, type MutableRefObject } from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { Sphere, Line, Html } from "@react-three/drei";
+import { Sphere, Html } from "@react-three/drei";
 import * as THREE from "three";
 
 /* ── data ─────────────────────────────────────────── */
 
-const NODE_3D: Record<string, [number, number, number]> = {
-  core: [0, 0.2, 3],
-  infra: [0, 2.2, -1],
-  author: [-2.5, 0.8, 1.8],
-  lab: [2.8, 0.5, 2],
-  ops: [-0.8, -0.8, 4],
+const ORBIT_RADIUS = 2.33;
+const CORE_Z = 2.5;
+
+const NODE_BASE: Record<string, [number, number, number]> = {
+  core: [0, 3, CORE_Z],
+  infra: [0, 3, CORE_Z - ORBIT_RADIUS],   // back
+  author: [-ORBIT_RADIUS, 3, CORE_Z],     // left
+  lab: [ORBIT_RADIUS, 3, CORE_Z],         // right
+  ops: [0, 3, CORE_Z + ORBIT_RADIUS],     // front
 };
+
+const CORE_POS = new THREE.Vector3(0, 3, CORE_Z);
+const ORBIT_SPEED = 0.075;
 
 const VARIANT_COLOR: Record<string, string> = {
   core: "#1a6b52",
@@ -23,6 +29,14 @@ const VARIANT_COLOR: Record<string, string> = {
   ops: "#3d4a52",
 };
 
+const FLOW_COLOR: Record<string, string> = {
+  core: "#7ae8c0",
+  author: "#b0a8e8",
+  lab: "#f0b878",
+  infra: "#78b8f0",
+  ops: "#b0bcc8",
+};
+
 const CONNECTIONS = [
   { from: "core", to: "author" },
   { from: "core", to: "infra" },
@@ -30,7 +44,7 @@ const CONNECTIONS = [
   { from: "core", to: "ops" },
 ];
 
-const PARTICLE_COUNT = 4;
+const PARTICLE_COUNT = 5;
 
 /* ── helpers ──────────────────────────────────────── */
 
@@ -40,52 +54,90 @@ function midPoint(a: THREE.Vector3, b: THREE.Vector3, lift: number) {
   return m;
 }
 
+function createGlowTexture(color: string): THREE.CanvasTexture {
+  const size = 128;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  const half = size / 2;
+
+  // stacked circles for natural light falloff
+  const stops = [
+    { r: 0.00, a: 1.0 },
+    { r: 0.03, a: 0.95 },
+    { r: 0.08, a: 0.75 },
+    { r: 0.18, a: 0.40 },
+    { r: 0.35, a: 0.12 },
+    { r: 0.55, a: 0.03 },
+    { r: 0.78, a: 0.005 },
+    { r: 1.00, a: 0.0 },
+  ];
+
+  for (let i = stops.length - 1; i >= 0; i--) {
+    const r = stops[i].r * half;
+    ctx.beginPath();
+    ctx.arc(half, half, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = stops[i].a;
+    ctx.fill();
+  }
+
+  ctx.globalAlpha = 1;
+  return new THREE.CanvasTexture(canvas);
+}
+
 /* ── connection curve + data particles ────────────── */
 
 function ConnectionParticles({
-  from,
-  to,
+  fromId,
+  toId,
+  worldRefs,
   color,
 }: {
-  from: THREE.Vector3;
-  to: THREE.Vector3;
+  fromId: string;
+  toId: string;
+  worldRefs: MutableRefObject<Map<string, THREE.Vector3>>;
   color: string;
 }) {
-  const curve = useMemo(() => {
-    const ctrl = midPoint(from, to, 0.8);
-    return new THREE.CatmullRomCurve3([from, ctrl, to]);
-  }, [from, to]);
-
+  const texture = useMemo(() => createGlowTexture(color), [color]);
   const particleRefs = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (!particleRefs.current) return;
+    const from = worldRefs.current.get(fromId);
+    const to = worldRefs.current.get(toId);
+    if (!from || !to) return;
+
+    const ctrl = midPoint(from, to, 0.15);
+    const curve = new THREE.CatmullRomCurve3([from.clone(), ctrl, to.clone()]);
+
     const t = state.clock.elapsedTime;
     particleRefs.current.children.forEach((child, i) => {
       const offset = i / PARTICLE_COUNT;
-      const raw = ((t * 0.25 + offset) % 1 + 1) % 1;
+      const raw = ((t * 0.22 + offset) % 1 + 1) % 1;
       const pt = curve.getPointAt(raw);
       child.position.copy(pt);
+
+      const pulse = 0.7 + Math.sin(t * 3 + offset * Math.PI * 2) * 0.3;
+      const s = child.scale as THREE.Vector3;
+      s.setScalar(0.6 * pulse);
     });
   });
 
   return (
-    <>
-      <Line
-        points={curve.getPoints(40)}
-        color={color}
-        lineWidth={1}
-        transparent
-        opacity={0.2}
-      />
-      <group ref={particleRefs}>
-        {Array.from({ length: PARTICLE_COUNT }).map((_, i) => (
-          <Sphere key={i} args={[0.06, 8, 8]}>
-            <meshBasicMaterial color={color} transparent opacity={0.9} />
-          </Sphere>
-        ))}
-      </group>
-    </>
+    <group ref={particleRefs}>
+      {Array.from({ length: PARTICLE_COUNT }).map((_, i) => (
+        <sprite key={i} scale={[0.6, 0.6, 1]}>
+          <spriteMaterial
+            map={texture}
+            transparent
+            opacity={0.85}
+            depthTest={false}
+          />
+        </sprite>
+      ))}
+    </group>
   );
 }
 
@@ -93,7 +145,8 @@ function ConnectionParticles({
 
 function NodeSphere({
   id,
-  position,
+  basePos,
+  worldRefs,
   variant,
   disabled,
   isActive,
@@ -102,7 +155,8 @@ function NodeSphere({
   onPointerOut,
 }: {
   id: string;
-  position: THREE.Vector3;
+  basePos: THREE.Vector3;
+  worldRefs: MutableRefObject<Map<string, THREE.Vector3>>;
   variant: string;
   disabled?: boolean;
   isActive: boolean;
@@ -111,21 +165,44 @@ function NodeSphere({
   onPointerOut: () => void;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const baseY = position.y;
   const color = disabled ? "#88949e" : VARIANT_COLOR[variant] ?? "#556c78";
+
+  // orbit params (non-core only)
+  const isCore = id === "core";
+  const orbitRadius = useMemo(() => {
+    if (isCore) return 0;
+    const dx = basePos.x - CORE_POS.x;
+    const dz = basePos.z - CORE_POS.z;
+    return Math.sqrt(dx * dx + dz * dz);
+  }, [isCore, basePos]);
+  const orbitInitialAngle = useMemo(() => {
+    if (isCore) return 0;
+    return Math.atan2(basePos.z - CORE_POS.z, basePos.x - CORE_POS.x);
+  }, [isCore, basePos]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
-    const phase = position.x * 0.5 + position.z * 0.3;
-    groupRef.current.position.y =
-      baseY + Math.sin(t * 0.6 + phase) * 0.15 + Math.cos(t * 0.4 + phase) * 0.08;
-    groupRef.current.position.x =
-      position.x + Math.cos(t * 0.5 + phase) * 0.08;
+
+    if (isCore) {
+      // core stays centered with gentle bob
+      groupRef.current.position.x = CORE_POS.x + Math.cos(t * 0.5) * 0.06;
+      groupRef.current.position.y = CORE_POS.y + Math.sin(t * 0.6) * 0.1;
+      groupRef.current.position.z = CORE_POS.z + Math.sin(t * 0.4) * 0.06;
+    } else {
+      // orbit around core in XZ plane (all nodes same Y plane)
+      const angle = orbitInitialAngle + t * ORBIT_SPEED;
+      groupRef.current.position.x = CORE_POS.x + Math.cos(angle) * orbitRadius;
+      groupRef.current.position.z = CORE_POS.z + Math.sin(angle) * orbitRadius;
+      groupRef.current.position.y = basePos.y;
+    }
+
+    // update world ref
+    worldRefs.current.get(id)?.copy(groupRef.current.position);
   });
 
   return (
-    <group ref={groupRef} position={[position.x, position.y, position.z]}>
+    <group ref={groupRef} position={[basePos.x, basePos.y, basePos.z]}>
       {/* outer glow */}
       <Sphere args={[isActive ? 0.45 : 0.32, 16, 16]}>
         <meshBasicMaterial
@@ -171,9 +248,20 @@ type SceneProps = {
 };
 
 function Scene({ activeNodeId, hoveredNodeId, onSelectNode, onHoverNode, disabledNodes }: SceneProps) {
-  const nodePositions3D = useMemo(() => {
+  const worldRefs = useRef<Map<string, THREE.Vector3>>(new Map());
+
+  // init world refs
+  useMemo(() => {
+    for (const [id, pos] of Object.entries(NODE_BASE)) {
+      if (!worldRefs.current.has(id)) {
+        worldRefs.current.set(id, new THREE.Vector3(pos[0], pos[1], pos[2]));
+      }
+    }
+  }, []);
+
+  const nodeBasePositions = useMemo(() => {
     const map = new Map<string, THREE.Vector3>();
-    for (const [id, pos] of Object.entries(NODE_3D)) {
+    for (const [id, pos] of Object.entries(NODE_BASE)) {
       map.set(id, new THREE.Vector3(pos[0], pos[1], pos[2]));
     }
     return map;
@@ -181,25 +269,22 @@ function Scene({ activeNodeId, hoveredNodeId, onSelectNode, onHoverNode, disable
 
   return (
     <>
-      {CONNECTIONS.map(({ from, to }) => {
-        const a = nodePositions3D.get(from);
-        const b = nodePositions3D.get(to);
-        if (!a || !b) return null;
-        return (
-          <ConnectionParticles
-            key={`${from}-${to}`}
-            from={a}
-            to={b}
-            color={VARIANT_COLOR[to] ?? "#556c78"}
-          />
-        );
-      })}
+      {CONNECTIONS.map(({ from, to }) => (
+        <ConnectionParticles
+          key={`${from}-${to}`}
+          fromId={from}
+          toId={to}
+          worldRefs={worldRefs}
+          color={FLOW_COLOR[to] ?? "#e8eaed"}
+        />
+      ))}
 
-      {Array.from(nodePositions3D.entries()).map(([id, pos]) => (
+      {Array.from(nodeBasePositions.entries()).map(([id, pos]) => (
         <NodeSphere
           key={id}
           id={id}
-          position={pos}
+          basePos={pos}
+          worldRefs={worldRefs}
           variant={id}
           disabled={disabledNodes.includes(id)}
           isActive={id === activeNodeId}
@@ -218,7 +303,7 @@ export function AtlasScene(props: SceneProps) {
   return (
     <Canvas
       gl={{ alpha: true, antialias: true, premultipliedAlpha: true }}
-      camera={{ position: [0, 0.5, 14], fov: 38, near: 0.1, far: 80 }}
+      camera={{ position: [0, 8, 11], fov: 42, near: 0.1, far: 80 }}
       style={{ position: "absolute", inset: 0, zIndex: 3 }}
       dpr={[1, 1.5]}
       performance={{ min: 0.5 }}
