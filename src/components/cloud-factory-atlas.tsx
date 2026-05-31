@@ -115,103 +115,74 @@ export function CloudFactoryAtlas() {
 
   return (
     <main className={styles.shell}>
-      <header className={styles.topbar}>
-        <a
-          className={styles.brand}
-          href="#core"
-          onClick={(e) => {
-            e.preventDefault();
-            setActiveNodeId("core");
-          }}
-        >
-          <span className={styles.brandMark}>NL</span>
-          <span>
-            <span className={styles.brandName}>{siteConfig.name}</span>
-            <span className={styles.brandMeta}>Cloud Factory Atlas</span>
-          </span>
-        </a>
+      <div className={styles.narrative}>
+        <p className={styles.kicker}>Operational systems platform</p>
+        <h1>Nubelab</h1>
+        <p>A cloud lab for systems, infrastructure and operations</p>
+      </div>
 
-        <div className={styles.headerTools}>
-          <label className={styles.jumpLabel} htmlFor="atlas-jump">
-            Jump
-          </label>
-          <select
-            className={styles.jumpSelect}
-            id="atlas-jump"
-            onChange={(e) => setActiveNodeId(e.target.value as AtlasNode["id"])}
-            value={activeNode.id}
-          >
-            {atlasNodes.map((n) => (
-              <option key={n.id} value={n.id}>
-                {n.title}
-              </option>
-            ))}
-          </select>
-        </div>
-      </header>
+      <div className={styles.mapStage}>
+        <Suspense fallback={null}>
+          <CloudCanvas />
+        </Suspense>
+        <Suspense fallback={null}>
+          <AtlasScene
+            activeNodeId={activeNodeId}
+            hoveredNodeId={hoveredNodeId}
+            onSelectNode={(id) => setActiveNodeId(id as AtlasNode["id"])}
+            onHoverNode={setHoveredNodeId}
+            disabledNodes={disabledNodes}
+          />
+        </Suspense>
 
-      <section className={styles.hero}>
-        <div className={styles.narrative}>
-          <p className={styles.kicker}>Operational systems platform</p>
-          <h1>Nubelab</h1>
-          <p>A cloud lab for systems, infrastructure and operations</p>
+        <div className={styles.mapHint} data-map-control>
+          {hoveredNodeId
+            ? `${previewTitle.title} — ${previewTitle.state}`
+            : "Select a node."}
         </div>
 
-        <div
-          aria-label="Interactive NubeLab cloud factory map"
-          className={styles.mapStage}
-        >
-          <div className={styles.mapWorld}>
-            <Suspense fallback={null}>
-              <CloudCanvas />
-            </Suspense>
-            <Suspense fallback={null}>
-              <AtlasScene
-                activeNodeId={activeNodeId}
-                hoveredNodeId={hoveredNodeId}
-                onSelectNode={(id) => setActiveNodeId(id as AtlasNode["id"])}
-                onHoverNode={setHoveredNodeId}
-                disabledNodes={disabledNodes}
-              />
-            </Suspense>
-
-            <div className={styles.mapHint} data-map-control>
-              {hoveredNodeId
-                ? `${previewTitle.title} — ${previewTitle.state}`
-                : "Select a node. Follow the radial system."}
-            </div>
-
-            <div className={styles.sysRef} aria-hidden="true">
-              SYS.ATLAS — {siteConfig.domain}
-            </div>
-          </div>
+        <div className={styles.sysRef} aria-hidden="true">
+          SYS.ATLAS — {siteConfig.domain}
         </div>
+      </div>
 
-        <aside className={styles.inspector} data-map-control>
-          <div className={styles.inspectorHeader}>
-            <span>{activeNode.role}</span>
-            <strong>{activeNode.state}</strong>
-          </div>
-          <h2>{activeNode.title}</h2>
-          <p>{activeNode.description}</p>
-          <p className={styles.inspectorDetail}>{activeNode.detail}</p>
-          <div className={styles.tagCloud}>
-            {activeNode.tags.map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-          {activeNode.href ? (
-            <a
-              className={styles.inspectorLink}
-              href={activeNode.href}
-              rel="noreferrer"
-              target="_blank"
+      <aside className={styles.inspector} data-map-control>
+        <nav className={styles.nodeTabs}>
+          {atlasNodes.map((n) => (
+            <button
+              key={n.id}
+              className={n.id === activeNode.id ? styles.nodeTabActive : styles.nodeTab}
+              onClick={() => setActiveNodeId(n.id)}
+              type="button"
             >
-              Open external system
-            </a>
-          ) : null}
-        </aside>
-      </section>
+              {n.short}
+            </button>
+          ))}
+        </nav>
+
+        <div className={styles.inspectorHeader}>
+          <span>{activeNode.role}</span>
+          <strong>{activeNode.state}</strong>
+        </div>
+        <h2>{activeNode.title}</h2>
+        <p>{activeNode.description}</p>
+        <p className={styles.inspectorDetail}>{activeNode.detail}</p>
+        <div className={styles.tagCloud}>
+          {activeNode.tags.map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+        </div>
+        {activeNode.href ? (
+          <a
+            className={styles.inspectorLink}
+            href={activeNode.href}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Open external system
+          </a>
+        ) : null}
+      </aside>
     </main>
   );
 }

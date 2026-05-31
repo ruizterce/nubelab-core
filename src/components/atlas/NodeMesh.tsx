@@ -2,11 +2,9 @@
 
 import { useRef, useState, useMemo } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { Outlines, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { createGradientMap, TOON_COLORS } from "./helpers";
-import { GlowSprite } from "./GlowSprite";
-
 /* ── geometry config ──────────────────────────────── */
 
 export const NODE_GEOMETRY: Record<string, { geo: string; args: [number, ...number[]]; rotSpeed: [number, number, number] }> = {
@@ -29,8 +27,8 @@ useGLTF.preload(LANDER_PATH);
 useGLTF.preload(CARGO_PATH);
 
 const NODE_MODEL: Record<string, string> = { ops: DRILL_PATH, author: ASTRONAUT_PATH, core: LANDER_PATH, infra: CARGO_PATH };
-const NODE_MODEL_SCALE: Record<string, number> = { ops: 0.25, author: 0.20, core: 0.5, infra: 0.35 };
-const NODE_MODEL_OFFSET: Record<string, [number, number, number]> = { ops: [0, 0, 0], author: [0, -0.35, 0] };
+const NODE_MODEL_SCALE: Record<string, number> = { ops: 0.28, author: 0.15, core: 0.5, infra: 0.3 };
+const NODE_MODEL_OFFSET: Record<string, [number, number, number]> = { ops: [0, -0.2, 0], author: [0, -0.35, 0], core: [0, -0.2, 0] };
 
 function GltfModel({ url, scale: s, offset, gradientMap }: { url: string; scale: number; offset?: [number, number, number]; gradientMap: THREE.CanvasTexture }) {
   const { scene } = useGLTF(url);
@@ -89,10 +87,17 @@ export function NodeMesh({
             {cfg.geo === "torusKnot" && <torusKnotGeometry args={cfg.args as [number, number, number, number, number, number]} />}
             {cfg.geo === "capsule" && <capsuleGeometry args={cfg.args as [number, number, number, number]} />}
             <meshToonMaterial color="#ffffff" gradientMap={gradientMap} toneMapped={false} />
+            <Outlines thickness={0.05} color="#1a3a5c" opacity={0.8} angle={Math.PI / 3} />
           </mesh>
         )}
       </group>
-      <GlowSprite color="#ffffff" scale={id === "core" ? 3.2 : 2.2} opacity={id === "core" ? 0.4 : 0.2} />
+      {/* bloom trigger on hover — emissive pushes values above threshold */}
+      {isHovered && (
+        <mesh renderOrder={-1}>
+          <sphereGeometry args={[0.5, 16, 16]} />
+          <meshStandardMaterial color="#000000" emissive="#88aaff" emissiveIntensity={6} toneMapped={false} roughness={1} metalness={0} transparent opacity={0.1}/>
+        </mesh>
+      )}
     </group>
   );
 }

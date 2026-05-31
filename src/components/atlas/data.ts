@@ -23,10 +23,14 @@ export const FLOW_COLOR: Record<string, string> = {
 };
 
 export const CONNECTIONS = [
-  { from: "core", to: "author" },
   { from: "core", to: "infra" },
   { from: "core", to: "lab" },
   { from: "core", to: "ops" },
+  { from: "infra", to: "core" },
+  { from: "infra", to: "lab" },
+  { from: "author", to: "core" },
+  { from: "author", to: "infra" },
+  { from: "author", to: "ops" },
 ];
 
-export const PARTICLE_COUNT = 3;
+export const PARTICLE_COUNT = 1.7;

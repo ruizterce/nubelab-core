@@ -4,10 +4,6 @@ NubeLab Core is the main public platform for `nubelab.es`: an operational
 systems platform for infrastructure, automation, industrial operations, AI
 workflows, and technical integration.
 
-This is not intended to behave like a traditional developer portfolio. It is the
-narrative and architectural layer of the NubeLab ecosystem. The live
-infrastructure surface remains independent at `infra.nubelab.es`.
-
 ## Stack
 
 - Next.js
@@ -23,9 +19,6 @@ infrastructure surface remains independent at `infra.nubelab.es`.
 npm install
 npm run dev
 ```
-
-Open `http://localhost:3000`.
-
 Recommended checks:
 
 ```bash
@@ -34,27 +27,6 @@ npm run lint
 npm run build
 ```
 
-## Production Shape
-
-```text
-Internet
-  -> central Caddy container
-  -> nubelab-core-web-1:3000
-```
-
-Production deployment uses:
-
-- compose project: `nubelab-core`
-- image: `ghcr.io/ruizterce/nubelab-core:latest`
-- VPS path: `/opt/nubelab-core`
-- public domain: `nubelab.es`
-- public network: `proxy_net`
-
-## Content
-
-Content starts in English under `content/en`. The locale model is intentionally
-simple so Spanish translations can be added later without changing the platform
-shape.
 
 ## Documentation
 

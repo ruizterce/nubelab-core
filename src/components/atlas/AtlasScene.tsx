@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { NODE_BASE, FLOW_COLOR, CONNECTIONS } from "./data";
 import { ConnectionParticles } from "./connections";
@@ -52,10 +53,10 @@ function Scene({ activeNodeId, hoveredNodeId, onSelectNode, onHoverNode }: Scene
       <ambientLight intensity={0.15} />
       <directionalLight position={[5, 8, 5]} intensity={2.5} />
 
-      {CONNECTIONS.map(({ from, to }) => (
+      {CONNECTIONS.map(({ from, to }, i) => (
         <ConnectionParticles key={`${from}-${to}`}
           fromId={from} toId={to} worldRefs={worldRefs}
-          color={FLOW_COLOR[to] ?? "#9bb8cc"} />
+          color={FLOW_COLOR[to] ?? "#9bb8cc"} sequence={i} />
       ))}
 
       {Array.from(bases.entries()).map(([id, pos]) => (
@@ -63,6 +64,10 @@ function Scene({ activeNodeId, hoveredNodeId, onSelectNode, onHoverNode }: Scene
           <NodeMesh id={id} isHovered={id === hoveredNodeId} {...clickHandlers[id]} />
         </OrbitalNode>
       ))}
+
+      <EffectComposer>
+        <Bloom mipmapBlur luminanceThreshold={0.1} luminanceSmoothing={0.04} levels={16} intensity={1} transparent opacity={0.2}/>
+      </EffectComposer>
     </>
   );
 }
@@ -72,7 +77,7 @@ export function AtlasScene(props: SceneProps) {
     <Canvas
       flat
       gl={{ alpha: true, antialias: true, premultipliedAlpha: true, toneMapping: THREE.NoToneMapping }}
-      camera={{ position: [0, 8, 11], fov: 42, near: 0.1, far: 80 }}
+      camera={{ position: [0, 9.6, 11], fov: 42, near: 0.1, far: 80 }}
       style={{ position: "absolute", inset: 0, zIndex: 3 }}
       dpr={[1, 1.5]} performance={{ min: 0.5 }}
     >

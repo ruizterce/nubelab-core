@@ -17,43 +17,33 @@ function CloudPlatform() {
 
   return (
     <Clouds material={THREE.MeshBasicMaterial} ref={groupRef}>
-      {/* Main cloud body — chunky toon style */}
       <Cloud
-        seed={1}
-        position={[0, 3, 2.5]}
-        scale={[1, 0.55, 0.65]}
+        seed={10}
+        position={[0.2, 3, 2.8]}
+        scale={[0.6, 0.55, 0.65]}
         opacity={1}
-        speed={0.05}
+        speed={0.1}
         segments={16}
-        bounds={[2.6, 1.8, 2.8]}
+        bounds={[3, 0.5, 0.5]}
         color="#ffffff"
         concentrate="inside"
+        volume={5}
+        fade={20}
+        growth={6}
       />
-
-      {/* Left lobe */}
-      <Cloud
-        seed={2}
-        position={[-1, 2.9, 2.2]}
-        scale={[0.55, 0.4, 0.45]}
-        opacity={0.85}
-        speed={0.04}
-        segments={10}
-        bounds={[1.6, 1.5, 1.8]}
-        color="#f8fafc"
-        concentrate="inside"
-      />
-
-      {/* Right lobe */}
-      <Cloud
-        seed={3}
-        position={[1, 3, 2.1]}
-        scale={[0.55, 0.4, 0.45]}
-        opacity={0.85}
-        speed={0.04}
-        segments={10}
-        bounds={[1.6, 1.5, 1.8]}
-        color="#f4f6f8"
-        concentrate="inside"
+            <Cloud
+        seed={9}
+        position={[0.2, 3, 2.8]}
+        scale={[0.6, 0.55, 0.65]}
+        opacity={0.5}
+        speed={0.3}
+        segments={16}
+        bounds={[3, 0.7, 0.6]}
+        color="#d7eefd"
+        concentrate="outside"
+        volume={6}
+        fade={30}
+        growth={8}
       />
     </Clouds>
   );
@@ -70,7 +60,7 @@ export const CloudCanvas = memo(function CloudCanvas() {
         toneMapping: THREE.NoToneMapping,
       }}
       camera={{
-        position: [0, 8, 11],
+        position: [0, 9.6, 11],
         fov: 42,
         near: 0.1,
         far: 80,
@@ -84,12 +74,6 @@ export const CloudCanvas = memo(function CloudCanvas() {
       dpr={[1, 1.5]}
       performance={{ min: 0.5 }}
     >
-      <ambientLight intensity={3.5} color="#ffffff" />
-      <directionalLight
-        position={[0, 12, 1]}
-        intensity={3.0}
-        color="#ffffff"
-      />
       <CloudPlatform />
     </Canvas>
   );

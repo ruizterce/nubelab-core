@@ -1,109 +1,18 @@
 .shell {
-  min-height: 100svh;
-  overflow-x: hidden;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 255, 255, 0.7), transparent 70%),
-    linear-gradient(180deg, #e2ecf4 0%, #dae6f0 25%, #cde0ee 55%, #c2d8ea 80%, #b2cde3 100%);
-  color: var(--foreground);
-}
-
-.topbar {
-  position: fixed;
-  z-index: 30;
-  top: 18px;
-  left: 24px;
-  right: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  pointer-events: none;
-}
-
-.brand,
-.headerTools {
-  pointer-events: auto;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--foreground);
-}
-
-.brandMark {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border: 1px solid var(--accent);
-  background: var(--surface-raised);
-  box-shadow: 4px 4px 0 rgba(27, 77, 107, 0.1);
-  font-family: var(--font-mono-stack);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-}
-
-.brandName,
-.brandMeta {
-  display: block;
-}
-
-.brandName {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.brandMeta {
-  margin-top: 2px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.headerTools {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface-raised);
-  padding: 7px;
-  clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 13px 100%, 0 calc(100% - 13px));
-}
-
-.jumpLabel {
-  padding-left: 6px;
-  color: var(--muted);
-  font-family: var(--font-mono-stack);
-  font-size: 11px;
-  text-transform: uppercase;
-}
-
-.jumpSelect {
-  width: min(34vw, 270px);
-  border: 0;
-  background: var(--surface);
-  color: var(--foreground);
-  padding: 8px 10px;
-  font-size: 13px;
-  outline: 1px solid var(--border);
-}
-
-.hero {
-  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
   min-height: 100svh;
-  padding: 82px 24px 24px;
-  gap: 24px;
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(176, 220, 255, 0.7), transparent 70%),
+    linear-gradient(180deg, #e2ecf4 0%, #dae6f0 25%, #cde0ee 55%, #c2d8ea 80%, #b2cde3 100%);
+  color: var(--foreground);
 }
 
 .narrative {
   position: absolute;
   z-index: 18;
-  top: 128px;
+  top: 32px;
   left: 28px;
   max-width: 292px;
   pointer-events: none;
@@ -134,11 +43,41 @@
   line-height: 1.65;
 }
 
+/* ---------- jump select (inside inspector) ---------- */
+
+.jumpBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+
+.jumpLabel {
+  padding-left: 6px;
+  color: var(--muted);
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.jumpSelect {
+  width: 100%;
+  border: 0;
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 8px 10px;
+  font-size: 13px;
+  outline: 1px solid var(--border);
+}
+
 /* ---------- map stage ---------- */
 
 .mapStage {
   position: relative;
-  min-height: calc(100svh - 106px);
+  height: 100svh;
   overflow: hidden;
   cursor: default;
   isolation: isolate;
@@ -152,62 +91,19 @@
   pointer-events: none;
 }
 
-.mapWorld {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 50%;
-  width: min(980px, 82vw);
-  aspect-ratio: 1000 / 680;
-  transform-origin: center;
-  transform: translate3d(-50%, -50%, 0);
-}
-
-/* SCADA-style corner brackets */
-.mapWorld::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: -14px;
-  border: 1px solid var(--border-light);
-  pointer-events: none;
-  mask-image: linear-gradient(to right, #000 16px, transparent 16px, transparent calc(100% - 16px), #000 calc(100% - 16px)),
-    linear-gradient(to bottom, #000 16px, transparent 16px, transparent calc(100% - 16px), #000 calc(100% - 16px));
-  mask-composite: intersect;
-  -webkit-mask-image: linear-gradient(to right, #000 16px, transparent 16px, transparent calc(100% - 16px), #000 calc(100% - 16px)),
-    linear-gradient(to bottom, #000 16px, transparent 16px, transparent calc(100% - 16px), #000 calc(100% - 16px));
-  -webkit-mask-composite: source-in;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-/* ---------- map hint ---------- */
+/* ---------- overlays ---------- */
 
 .mapHint {
   position: absolute;
   z-index: 20;
-  pointer-events: auto;
-}
-
-.mapHint {
   top: 30px;
   left: min(34vw, 390px);
   color: var(--muted);
   font-family: var(--font-mono-stack);
   font-size: 11px;
   text-transform: uppercase;
+  pointer-events: auto;
 }
-
-/* ---------- system reference ---------- */
 
 .sysRef {
   position: absolute;
@@ -233,6 +129,8 @@
   background: var(--surface);
   box-shadow: -12px 0 28px rgba(19, 26, 32, 0.05);
   padding: 28px;
+  overflow-y: auto;
+  max-height: 100svh;
 }
 
 .inspectorHeader {
@@ -269,8 +167,6 @@
   color: var(--foreground) !important;
 }
 
-/* ---------- tag cloud ---------- */
-
 .tagCloud {
   display: flex;
   flex-wrap: wrap;
@@ -299,25 +195,10 @@
   font-weight: 700;
 }
 
-/* ---------- animations ---------- */
-
-
-
-@keyframes ledPulse {
-  0%, 100% {
-    opacity: 1;
-    box-shadow: 0 0 4px rgba(63, 185, 80, 0.5);
-  }
-  50% {
-    opacity: 0.5;
-    box-shadow: 0 0 12px rgba(63, 185, 80, 0.85);
-  }
-}
-
 /* ---------- responsive ---------- */
 
 @media (max-width: 1120px) {
-  .hero {
+  .shell {
     grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
     gap: 18px;
     padding-right: 18px;
@@ -328,25 +209,13 @@
   }
 
   .narrative {
-    top: 104px;
+    top: 28px;
     max-width: 270px;
   }
 }
 
 @media (max-width: 820px) {
-  .topbar {
-    position: relative;
-    top: auto;
-    right: auto;
-    left: auto;
-    padding: 16px;
-  }
-
-  .headerTools {
-    display: none;
-  }
-
-  .hero {
+  .shell {
     display: flex;
     min-height: auto;
     flex-direction: column;
@@ -383,10 +252,6 @@
     overflow: visible;
   }
 
-  .mapWorld {
-    width: min(100%, 640px);
-  }
-
   .mapHint {
     display: none;
   }
@@ -403,6 +268,7 @@
     background: var(--surface);
     box-shadow: none;
     padding: 18px;
+    max-height: none;
   }
 }
 
@@ -415,16 +281,4 @@
     height: clamp(280px, 82vw, 340px);
     min-height: 0;
   }
-
-  .mapWorld {
-    width: 100%;
-  }
-
-
-
-
-
-
-
-
 }
