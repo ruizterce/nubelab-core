@@ -11,7 +11,7 @@ const CloudCanvas = dynamic(
 );
 
 const AtlasScene = dynamic(
-  () => import("./atlas-scene").then((mod) => ({ default: mod.AtlasScene })),
+  () => import("./atlas").then((mod) => ({ default: mod.AtlasScene })),
   { ssr: false }
 );
 

@@ -2,7 +2,7 @@
 
 import { memo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Cloud } from "@react-three/drei";
+import { Cloud, Clouds } from "@react-three/drei";
 import * as THREE from "three";
 
 function CloudPlatform() {
@@ -16,15 +16,15 @@ function CloudPlatform() {
   });
 
   return (
-    <group ref={groupRef}>
-      {/* Main cloud body */}
+    <Clouds material={THREE.MeshBasicMaterial} ref={groupRef}>
+      {/* Main cloud body — chunky toon style */}
       <Cloud
         seed={1}
         position={[0, 3, 2.5]}
         scale={[1, 0.55, 0.65]}
-        opacity={0.95}
-        speed={0.08}
-        segments={35}
+        opacity={1}
+        speed={0.05}
+        segments={16}
         bounds={[2.6, 1.8, 2.8]}
         color="#ffffff"
         concentrate="inside"
@@ -33,39 +33,41 @@ function CloudPlatform() {
       {/* Left lobe */}
       <Cloud
         seed={2}
-        position={[-0.9, 2.9, 2.3]}
-        scale={[0.55, 0.35, 0.4]}
-        opacity={0.7}
-        speed={0.06}
-        segments={22}
-        bounds={[1.6, 1.4, 1.8]}
-        color="#ffffff"
+        position={[-1, 2.9, 2.2]}
+        scale={[0.55, 0.4, 0.45]}
+        opacity={0.85}
+        speed={0.04}
+        segments={10}
+        bounds={[1.6, 1.5, 1.8]}
+        color="#f8fafc"
         concentrate="inside"
       />
 
       {/* Right lobe */}
       <Cloud
         seed={3}
-        position={[0.9, 3, 2.2]}
-        scale={[0.55, 0.35, 0.4]}
-        opacity={0.7}
-        speed={0.06}
-        segments={22}
-        bounds={[1.6, 1.4, 1.8]}
-        color="#ffffff"
+        position={[1, 3, 2.1]}
+        scale={[0.55, 0.4, 0.45]}
+        opacity={0.85}
+        speed={0.04}
+        segments={10}
+        bounds={[1.6, 1.5, 1.8]}
+        color="#f4f6f8"
         concentrate="inside"
       />
-    </group>
+    </Clouds>
   );
 }
 
 export const CloudCanvas = memo(function CloudCanvas() {
   return (
     <Canvas
+      flat
       gl={{
         alpha: true,
-        antialias: true,
+        antialias: false,
         premultipliedAlpha: true,
+        toneMapping: THREE.NoToneMapping,
       }}
       camera={{
         position: [0, 8, 11],
@@ -82,10 +84,10 @@ export const CloudCanvas = memo(function CloudCanvas() {
       dpr={[1, 1.5]}
       performance={{ min: 0.5 }}
     >
-      <ambientLight intensity={4.0} color="#ffffff" />
+      <ambientLight intensity={3.5} color="#ffffff" />
       <directionalLight
         position={[0, 12, 1]}
-        intensity={2.5}
+        intensity={3.0}
         color="#ffffff"
       />
       <CloudPlatform />
