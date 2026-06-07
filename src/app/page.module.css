@@ -1,3 +1,17 @@
+/* ─────────────────────────────────────────────────────
+ * NubeLab — page layout
+ *
+ * Breakpoint tiers:
+ *   < 400px      small mobile   — stacked, tight
+ *   400–767px    mobile         — stacked, 1:1 canvas
+ *   768–1023px   tablet         — overlay, adjusted type
+ *   ≥ 1024px     desktop        — overlay, full size
+ *   ≥ 1440px     wide           — overlay, generous
+ *   ≥ 2560px     ultra-wide     — overlay, aspect-limited
+ * ──────────────────────────────────────────────────── */
+
+/* ── nav (all breakpoints) ────────────────────────── */
+
 .nav {
   display: flex;
   align-items: center;
@@ -16,6 +30,8 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .links {
@@ -24,6 +40,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .links a {
@@ -38,15 +56,25 @@
   color: var(--foreground);
 }
 
+/* ── hero (base — overridden at mobile breakpoints) ─ */
+
 .hero {
   position: relative;
   height: calc(100svh - 48px);
 }
 
+/* ── scene container ──────────────────────────────── */
+
 .sceneContainer {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
 }
+
+/* ── overlay text (desktop + tablet) ──────────────── */
 
 .heroText {
   position: absolute;
@@ -60,16 +88,20 @@
   margin: 0;
   font-size: clamp(2rem, 3vw, 3.5rem);
   font-weight: 780;
-  color: var(--foreground);
+  color: var(--overlay-foreground);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .heroText p {
   margin: 12px 0 0;
   font-size: 16px;
-  color: var(--muted);
+  color: var(--overlay-muted);
   max-width: 32rem;
   line-height: 1.6;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
+
+/* ── tooltip (all breakpoints) ────────────────────── */
 
 .tooltip {
   position: absolute;
@@ -84,4 +116,187 @@
   font-weight: 600;
   color: var(--accent);
   pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════
+ * TABLET — 768–1023px
+ * Still overlay, but tighter spacing and smaller type
+ * ═══════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .heroText {
+    bottom: 36px;
+    left: 24px;
+  }
+
+  .heroText h1 {
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  }
+
+  .heroText p {
+    font-size: 14px;
+    max-width: 24rem;
+  }
+
+  .tooltip {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+ * WIDE — ≥ 1440px
+ * More generous spacing and type scale
+ * ═══════════════════════════════════════════════════════ */
+
+@media (min-width: 1440px) {
+  .heroText {
+    bottom: 64px;
+    left: 40px;
+  }
+
+  .heroText h1 {
+    font-size: clamp(2.5rem, 3vw, 4.5rem);
+  }
+
+  .heroText p {
+    font-size: 18px;
+    max-width: 36rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+ * ULTRA-WIDE — ≥ 2560px
+ * Letterboxing edges softened with a subtle vignette
+ * ═══════════════════════════════════════════════════════ */
+
+@media (min-width: 2560px) {
+  .sceneContainer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, #000 0%, transparent 8%, transparent 92%, #000 100%),
+      linear-gradient(to bottom, transparent 0%, transparent 100%);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+ * MOBILE — < 768px
+ * Stacked layout: canvas on top, text below
+ * ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  .nav {
+    padding: 0 16px;
+  }
+
+  .links {
+    gap: 16px;
+  }
+
+  .hero {
+    height: auto;
+    min-height: calc(100svh - 48px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sceneContainer {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: calc(100svh - 48px);
+    flex-shrink: 0;
+  }
+
+  /* revert to dark-on-light for the separate text section */
+  .heroText {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    z-index: 1;
+    pointer-events: auto;
+    padding: 28px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--background);
+  }
+
+  .heroText h1 {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    color: var(--foreground);
+    text-shadow: none;
+  }
+
+  .heroText p {
+    font-size: 14px;
+    max-width: 28rem;
+    color: var(--muted);
+    text-shadow: none;
+  }
+
+  .tooltip {
+    top: 16px;
+    right: 16px;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+ * SMALL MOBILE — < 400px
+ * Extra-tight spacing, slightly shorter canvas
+ * ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 399px) {
+  .nav {
+    padding: 0 12px;
+    height: 44px;
+  }
+
+  .logo {
+    font-size: 12px;
+  }
+
+  .links {
+    gap: 10px;
+  }
+
+  .links a {
+    font-size: 11px;
+  }
+
+  .hero {
+    min-height: calc(100svh - 44px);
+  }
+
+  .sceneContainer {
+    aspect-ratio: 4 / 5;
+    max-height: calc(100svh - 44px);
+  }
+
+  .heroText {
+    padding: 20px 12px;
+  }
+
+  .heroText h1 {
+    font-size: clamp(1.25rem, 7vw, 1.75rem);
+  }
+
+  .heroText p {
+    font-size: 13px;
+  }
+
+  .tooltip {
+    top: 10px;
+    right: 10px;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
 }

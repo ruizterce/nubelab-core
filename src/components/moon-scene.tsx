@@ -7,12 +7,16 @@ import {
   useFrame,
   type ThreeEvent,
 } from "@react-three/fiber";
-import { useGLTF, Environment } from "@react-three/drei";
+import { useGLTF, Environment, Html } from "@react-three/drei";
 import {
   EffectComposer,
   Bloom,
   ToneMapping,
   Vignette,
+  SMAA,
+  ChromaticAberration,
+  Noise,
+  Pixelation,
 } from "@react-three/postprocessing";
 import { ToneMappingMode } from "postprocessing";
 import * as THREE from "three";
@@ -25,7 +29,6 @@ import {
 const MODEL_PATH = "/3d-models/moon-base.glb";
 useGLTF.preload(MODEL_PATH);
 
-
 const HOVER_EMISSIVE = "#4488cc";
 
 /* ── helpers ──────────────────────────────────────── */
@@ -33,18 +36,78 @@ const HOVER_EMISSIVE = "#4488cc";
 function findBuilding(obj: THREE.Object3D): string | null {
   let current: THREE.Object3D | null = obj;
   while (current) {
-    if (current.name === "Terrain_ROOT") return null;
+    if (current.name === "Terrain_ROOT" || current.name === "Props_ROOT")
+      return null;
     if (current.name.endsWith("_ROOT")) return current.name;
     current = current.parent;
   }
   return null;
 }
 
+/* ── building labels ──────────────────────────────── */
+
+/** Per-building label offsets in world units [x, y, z]. Defaults to [0, 0, 0]. */
+const LABEL_OFFSETS: Record<string, [number, number, number]> = {
+  Core: [2.5, 0, 0],
+  Author: [2, 0, 0],
+  Monitor: [3, 0.2, 0],
+};
+
+function BuildingLabels({ model }: { model: THREE.Group }) {
+  const buildings = useMemo(() => {
+    const result: {
+      name: string;
+      position: [number, number, number];
+    }[] = [];
+    model.traverse((child) => {
+      if (
+        child.name.endsWith("_ROOT") &&
+        child.name !== "Terrain_ROOT" &&
+        child.name !== "Props_ROOT"
+      ) {
+        const center = new THREE.Vector3();
+        const box = new THREE.Box3().setFromObject(child);
+        child.getWorldPosition(center);
+        result.push({
+          name: child.name.replace("_ROOT", ""),
+          position: [center.x, center.y, center.z],
+        });
+      }
+    });
+    return result;
+  }, [model]);
+
+  return (
+    <>
+      {buildings.map((b) => {
+        const offset = LABEL_OFFSETS[b.name] ?? [0, 0, 0];
+        return (
+          <Html
+            key={b.name}
+            position={[
+              b.position[0] + offset[0],
+              b.position[1] + offset[1],
+              b.position[2] + offset[2],
+            ]}
+            center
+            sprite
+            distanceFactor={8}
+            occlude={false}
+            style={{ pointerEvents: "none" }}
+          >
+            <span className="building-label">{b.name}</span>
+          </Html>
+        );
+      })}
+    </>
+  );
+}
+
 /* ── camera from GLB ──────────────────────────────── */
 
 /** FOV limits (degrees) – prevents fisheye distortion or tunnel vision */
-const MIN_FOV = 5;
-const MAX_FOV = 30;
+const MIN_FOV = 18;
+const MAX_FOV = 35;
 
 function SceneCamera() {
   const { scene } = useGLTF(MODEL_PATH);
@@ -99,7 +162,7 @@ function DayNightCycle() {
   const sunDotRef = useRef<THREE.Mesh>(null!);
   const moonDotRef = useRef<THREE.Mesh>(null!);
 
-  const ORBIT_RADIUS = 15;
+  const ORBIT_RADIUS = 25;
   const TILT = Math.PI / 2;
   const INCLINATION = Math.PI / 2;
   const Y_OFFSET = 0;
@@ -151,7 +214,7 @@ function DayNightCycle() {
         shadow-mapSize-width={4096}
         shadow-mapSize-height={4096}
         shadow-camera-near={1}
-        shadow-camera-far={40}
+        shadow-camera-far={60}
         shadow-camera-left={-20}
         shadow-camera-right={20}
         shadow-camera-top={20}
@@ -166,13 +229,13 @@ function DayNightCycle() {
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
         shadow-camera-near={1}
-        shadow-camera-far={30}
-        shadow-camera-left={-12}
-        shadow-camera-right={12}
-        shadow-camera-top={12}
-        shadow-camera-bottom={-12}
+        shadow-camera-far={60}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
         shadow-bias={-0.0001}
-        shadow-radius={40}
+        shadow-radius={30}
       />
       <mesh ref={sunDotRef}>
         <sphereGeometry args={[1, 16, 16]} />
@@ -193,7 +256,7 @@ function MoonBase({
   onHover,
   terrainHue = -0.45,
   terrainSaturation = 0.7,
-  buildingsHue = -0.035,
+  buildingsHue = -0.04,
   buildingsSaturation = 0.8,
 }: {
   onSelect: (id: string) => void;
@@ -209,14 +272,10 @@ function MoonBase({
   const prevHovered = useRef<string | null>(null);
 
   // shared uniforms for terrain materials
-  const terrainUniformsRef = useRef<TerrainUniforms>(
-    createTerrainUniforms(),
-  );
+  const terrainUniformsRef = useRef<TerrainUniforms>(createTerrainUniforms());
 
   // shared uniforms for building / non-terrain materials
-  const buildingsUniformsRef = useRef<TerrainUniforms>(
-    createTerrainUniforms(),
-  );
+  const buildingsUniformsRef = useRef<TerrainUniforms>(createTerrainUniforms());
 
   // keep uniforms in sync with props
   useLayoutEffect(() => {
@@ -341,34 +400,36 @@ function MoonBase({
   }, []);
 
   return (
-    <primitive
-      ref={modelRef}
-      object={model}
-      onClick={(e: ThreeEvent<MouseEvent>) => {
-        const building = findBuilding(e.object as THREE.Object3D);
-        if (building) onSelect(building);
-      }}
-      onPointerOver={(e: ThreeEvent<MouseEvent>) => {
-        document.body.style.cursor = "pointer";
-        const building = findBuilding(e.object as THREE.Object3D);
-        if (building) {
-          applyHover(building);
-          onHover(building);
-        }
-      }}
-      onPointerOut={() => {
-        document.body.style.cursor = "default";
-        applyHover(null);
-        onHover(null);
-      }}
-    />
+    <group>
+      <BuildingLabels model={model} />
+      <primitive
+        ref={modelRef}
+        object={model}
+        onClick={(e: ThreeEvent<MouseEvent>) => {
+          const building = findBuilding(e.object as THREE.Object3D);
+          if (building) onSelect(building);
+        }}
+        onPointerOver={(e: ThreeEvent<MouseEvent>) => {
+          const building = findBuilding(e.object as THREE.Object3D);
+          if (building) {
+            document.body.style.cursor = "pointer";
+            applyHover(building);
+            onHover(building);
+          }
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = "default";
+          applyHover(null);
+          onHover(null);
+        }}
+      />
+    </group>
   );
 }
 
 /* ── canvas ───────────────────────────────────────── */
 
 export function MoonScene({
-
   onSelect,
   onHover,
   terrainHue,
@@ -385,47 +446,63 @@ export function MoonScene({
   buildingsHue?: number;
   buildingsSaturation?: number;
 }) {
+  const ASPECT_LIMIT = 3.0; // max width/height ratio (allows up to 3:1 landscape / 1:3 portrait)
+
   return (
-    <Canvas
-      shadows
-      onCreated={({ gl }) => {
-        gl.shadowMap.enabled = true;
-        gl.shadowMap.type = THREE.PCFShadowMap;
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        maxWidth: `min(100vw, calc(100dvh * ${ASPECT_LIMIT}))`,
+        maxHeight: `min(100dvh, calc(100vw * ${ASPECT_LIMIT}))`,
+        position: "relative",
       }}
-      style={{ position: "absolute", inset: 0 }}
-      dpr={[1, 1.5]}
     >
-      <SceneCamera />
-      <ambientLight intensity={0.05} />
-      <DayNightCycle />
-      <Environment
-        preset="night"
-        background={false}
-        environmentIntensity={1.5}
-      />
-      <EffectComposer multisampling={0}>
-        <Bloom
-          luminanceThreshold={0.7}
-          luminanceSmoothing={0.02}
-          intensity={1.6}
-          mipmapBlur
-          radius={0.65}
+      <Canvas
+        shadows
+        onCreated={({ gl }) => {
+          gl.shadowMap.enabled = true;
+          gl.shadowMap.type = THREE.PCFShadowMap;
+        }}
+        style={{ position: "absolute", inset: 0 }}
+        dpr={[1, 1.5]}
+      >
+        <SceneCamera />
+        <ambientLight intensity={0.05} />
+        <DayNightCycle />
+        <Environment
+          preset="city"
+          background={false}
+          environmentIntensity={0.35}
         />
-        <ToneMapping
-          mode={ToneMappingMode.ACES_FILMIC}
-          whitePoint={4.0}
-          middleGrey={0.6}
+        <EffectComposer multisampling={0}>
+          <ChromaticAberration offset={[0.0007, 0.0003]} />
+          <Noise opacity={0.03} />
+          <Pixelation granularity={0.5} />
+          <Bloom
+            luminanceThreshold={0.7}
+            luminanceSmoothing={0.02}
+            intensity={1.3}
+            mipmapBlur
+            radius={0.65}
+          />
+          <ToneMapping
+            mode={ToneMappingMode.ACES_FILMIC}
+            whitePoint={4.0}
+            middleGrey={0.6}
+          />
+          <Vignette offset={0.35} darkness={0.6} />
+          <SMAA />
+        </EffectComposer>
+        <MoonBase
+          onSelect={onSelect}
+          onHover={onHover}
+          terrainHue={terrainHue}
+          terrainSaturation={terrainSaturation}
+          buildingsHue={buildingsHue}
+          buildingsSaturation={buildingsSaturation}
         />
-        <Vignette offset={0.35} darkness={0.6} />
-      </EffectComposer>
-      <MoonBase
-        onSelect={onSelect}
-        onHover={onHover}
-        terrainHue={terrainHue}
-        terrainSaturation={terrainSaturation}
-        buildingsHue={buildingsHue}
-        buildingsSaturation={buildingsSaturation}
-      />
-    </Canvas>
+      </Canvas>
+    </div>
   );
 }
