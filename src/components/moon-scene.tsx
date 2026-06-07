@@ -16,12 +16,16 @@ import {
 } from "@react-three/postprocessing";
 import { ToneMappingMode } from "postprocessing";
 import * as THREE from "three";
+import {
+  createTerrainUniforms,
+  patchTerrainMaterial,
+  type TerrainUniforms,
+} from "./terrain-shader";
 
 const MODEL_PATH = "/3d-models/moon-base.glb";
 useGLTF.preload(MODEL_PATH);
 
 
-const BUILDINGS = ["Core_ROOT", "Author_ROOT", "Monitor_ROOT"] as const;
 const HOVER_EMISSIVE = "#4488cc";
 
 /* ── helpers ──────────────────────────────────────── */
@@ -40,7 +44,7 @@ function findBuilding(obj: THREE.Object3D): string | null {
 
 /** FOV limits (degrees) – prevents fisheye distortion or tunnel vision */
 const MIN_FOV = 5;
-const MAX_FOV = 80;
+const MAX_FOV = 30;
 
 function SceneCamera() {
   const { scene } = useGLTF(MODEL_PATH);
@@ -187,27 +191,46 @@ function DayNightCycle() {
 function MoonBase({
   onSelect,
   onHover,
+  terrainHue = -0.45,
+  terrainSaturation = 0.7,
+  buildingsHue = -0.035,
+  buildingsSaturation = 0.8,
 }: {
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
+  terrainHue?: number;
+  terrainSaturation?: number;
+  buildingsHue?: number;
+  buildingsSaturation?: number;
 }) {
   const { scene } = useGLTF(MODEL_PATH);
   const modelRef = useRef<THREE.Group>(null);
   const originals = useRef<Map<string, THREE.Material>>(new Map());
   const prevHovered = useRef<string | null>(null);
 
+  // shared uniforms for terrain materials
+  const terrainUniformsRef = useRef<TerrainUniforms>(
+    createTerrainUniforms(),
+  );
+
+  // shared uniforms for building / non-terrain materials
+  const buildingsUniformsRef = useRef<TerrainUniforms>(
+    createTerrainUniforms(),
+  );
+
+  // keep uniforms in sync with props
+  useLayoutEffect(() => {
+    terrainUniformsRef.current.uTerrainHue.value = terrainHue;
+    terrainUniformsRef.current.uTerrainSaturation.value = terrainSaturation;
+  }, [terrainHue, terrainSaturation]);
+
+  useLayoutEffect(() => {
+    buildingsUniformsRef.current.uTerrainHue.value = buildingsHue;
+    buildingsUniformsRef.current.uTerrainSaturation.value = buildingsSaturation;
+  }, [buildingsHue, buildingsSaturation]);
+
   const model = useMemo(() => {
     const c = scene.clone(true);
-    const terrain = c.getObjectByName("Terrain_ROOT");
-    if (terrain) {
-      terrain.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh) {
-          const mesh = child as THREE.Mesh;
-          mesh.raycast = () => {};
-          mesh.receiveShadow = true;
-        }
-      });
-    }
     c.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
@@ -217,6 +240,58 @@ function MoonBase({
     });
     return c;
   }, [scene]);
+
+  // material patching (needs refs, so must run in an effect — not during render)
+  // terrain gets one set of uniforms, everything else gets another
+  useLayoutEffect(() => {
+    const root = modelRef.current;
+    if (!root) return;
+    const terrain = root.getObjectByName("Terrain_ROOT");
+
+    // collect terrain materials so we can skip them in the buildings pass
+    const terrainMats = new Set<THREE.Material>();
+    if (terrain) {
+      terrain.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          mesh.raycast = () => {};
+          const materials = Array.isArray(mesh.material)
+            ? mesh.material
+            : [mesh.material];
+          for (const mat of materials) {
+            if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+              terrainMats.add(mat);
+              patchTerrainMaterial(
+                mat as THREE.MeshStandardMaterial,
+                terrainUniformsRef.current,
+              );
+            }
+          }
+        }
+      });
+    }
+
+    // patch everything else (buildings, props) with buildings uniforms
+    root.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        const materials = Array.isArray(mesh.material)
+          ? mesh.material
+          : [mesh.material];
+        for (const mat of materials) {
+          if (
+            (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial &&
+            !terrainMats.has(mat)
+          ) {
+            patchTerrainMaterial(
+              mat as THREE.MeshStandardMaterial,
+              buildingsUniformsRef.current,
+            );
+          }
+        }
+      }
+    });
+  }, [model]);
 
   const applyHover = useCallback((buildingName: string | null) => {
     const root = modelRef.current;
@@ -293,15 +368,22 @@ function MoonBase({
 /* ── canvas ───────────────────────────────────────── */
 
 export function MoonScene({
-  activeId,
-  hoveredId,
+
   onSelect,
   onHover,
+  terrainHue,
+  terrainSaturation,
+  buildingsHue,
+  buildingsSaturation,
 }: {
   activeId: string | null;
   hoveredId: string | null;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
+  terrainHue?: number;
+  terrainSaturation?: number;
+  buildingsHue?: number;
+  buildingsSaturation?: number;
 }) {
   return (
     <Canvas
@@ -336,7 +418,14 @@ export function MoonScene({
         />
         <Vignette offset={0.35} darkness={0.6} />
       </EffectComposer>
-      <MoonBase onSelect={onSelect} onHover={onHover} />
+      <MoonBase
+        onSelect={onSelect}
+        onHover={onHover}
+        terrainHue={terrainHue}
+        terrainSaturation={terrainSaturation}
+        buildingsHue={buildingsHue}
+        buildingsSaturation={buildingsSaturation}
+      />
     </Canvas>
   );
 }
