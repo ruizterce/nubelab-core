@@ -6,7 +6,7 @@ export const MODEL_PATH = "/3d-models/moon-base.glb";
 
 /* ── interaction ─────────────────────────────────── */
 
-export const HOVER_EMISSIVE = "#4488cc";
+export const HOVER_EMISSIVE = "#74db81";
 
 /* ── camera ──────────────────────────────────────── */
 
@@ -30,26 +30,40 @@ export const LABEL_OFFSETS: Record<string, [number, number, number]> = {
 
 export const GLOW_TEXTURE_SIZE = 256;
 
-export const GLOW_COLOR_STOPS: [number, string][] = [
-  [0, "rgba(255, 255, 220, 1)"],
-  [0.015, "rgba(255, 180, 120, 1)"],
-  [0.06, "rgba(255, 40, 15, 0.9)"],
-  [0.18, "rgba(220, 15, 5, 0.5)"],
-  [0.4, "rgba(180, 5, 0, 0.12)"],
-  [0.7, "rgba(80, 0, 0, 0.02)"],
-  [1, "rgba(0, 0, 0, 0)"],
-];
+/** Parse a hex color (e.g. "#ff3322") into [r, g, b] in 0-255 range */
+function hexToRgb(hex: string): [number, number, number] {
+  const v = parseInt(hex.replace("#", ""), 16);
+  return [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff];
+}
+
+/**
+ * Build radial glow color stops derived from a single base color.
+ * Center is white-hot, transitioning through the base hue at decreasing
+ * lightness / opacity until fully transparent at the edge.
+ */
+export function buildGlowColorStops(hex: string): [number, string][] {
+  const [r, g, b] = hexToRgb(hex);
+  return [
+    [0, `rgba(${r}, ${g}, ${b}, 1)`],
+    [0.015, `rgba(${Math.min(255, r + 100)}, ${Math.min(255, g + 100)}, ${Math.min(255, b + 100)}, 1)`],
+    [0.06, `rgba(${r}, ${g}, ${b}, 0.9)`],
+    [0.18, `rgba(${Math.floor(r * 0.8)}, ${Math.floor(g * 0.8)}, ${Math.floor(b * 0.8)}, 0.5)`],
+    [0.4, `rgba(${Math.floor(r * 0.4)}, ${Math.floor(g * 0.4)}, ${Math.floor(b * 0.4)}, 0.12)`],
+    [0.7, `rgba(${Math.floor(r * 0.15)}, ${Math.floor(g * 0.15)}, ${Math.floor(b * 0.15)}, 0.02)`],
+    [1, "rgba(0, 0, 0, 0)"],
+  ];
+}
 
 export const LIGHT_COLOR = "#ff3322";
 
 /** Blinking beacon configuration */
 export const BEACON = {
-  period: 2.0, // seconds between flashes
-  decay: 25, // exponential decay rate
-  peak: 10, // peak intensity during flash
+  period: 2.5, // seconds between flashes
+  decay: 30, // exponential decay rate
+  peak: 40, // peak intensity during flash
   distance: 8,
   decayExponent: 2,
-  spriteScale: [1.5, 1.5, 1] as [number, number, number],
+  spriteScale: [2.5, 2.5, 1] as [number, number, number],
   /** opacity = (intensity / peak) ^ opacityPower */
   opacityPower: 0.6,
 } as const;

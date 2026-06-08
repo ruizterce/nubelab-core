@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import {
   GLOW_TEXTURE_SIZE,
-  GLOW_COLOR_STOPS,
+  buildGlowColorStops,
   LIGHT_COLOR,
   BEACON,
   PLATFORM_LIGHT,
@@ -22,7 +22,7 @@ function getGlowTexture(): THREE.Texture {
     const ctx = canvas.getContext("2d")!;
     const h = size / 2;
     const g = ctx.createRadialGradient(h, h, 0, h, h, h);
-    for (const [stop, color] of GLOW_COLOR_STOPS) {
+    for (const [stop, color] of buildGlowColorStops(LIGHT_COLOR)) {
       g.addColorStop(stop, color);
     }
     ctx.fillStyle = g;
