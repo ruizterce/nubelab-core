@@ -56,6 +56,16 @@ function MoonBase({
         const mesh = child as THREE.Mesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        // recompute tight bounding volumes after clone so raycasting
+        // doesn't get false positives from stale/inflated bounds
+        if (mesh.geometry) {
+          mesh.geometry.computeBoundingSphere();
+          mesh.geometry.computeBoundingBox();
+        }
+        // invisible meshes (LOD, collision, helpers) shouldn't catch rays
+        if (!mesh.visible) {
+          mesh.raycast = () => {};
+        }
       }
     });
     return c;
