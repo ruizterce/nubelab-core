@@ -17,6 +17,12 @@
   --overlay-foreground: #ffffff;
   --overlay-muted: rgba(255, 255, 255, 0.65);
 
+  /* layout */
+  --sidebar-width: 260px;
+  --panel-width: clamp(400px, 55vw, 700px);
+  --panel-transition: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --glow-color: #74db81;
+
   --font-mono-stack: var(--font-mono), "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --font-sans-stack: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -58,6 +64,47 @@ select {
 
 .font-mono {
   font-family: var(--font-mono-stack);
+}
+
+/* ── status bar ──────────────────────────────────── */
+
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: var(--surface-raised);
+  border-top: 1px solid var(--border-light);
+  overflow: hidden;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+}
+
+.status-bar-track {
+  display: flex;
+  width: max-content;
+  animation: status-scroll 30s linear infinite;
+}
+
+.status-bar-text {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  white-space: nowrap;
+  padding: 0 16px;
+}
+
+@keyframes status-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* ── 3D building labels ──────────────────────────── */

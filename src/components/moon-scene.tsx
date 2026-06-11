@@ -30,6 +30,7 @@ import { MoonBase } from "./moon-scene/moon-base";
 export function MoonScene({
   onSelect,
   onHover,
+  cameraTarget,
   terrainHue,
   terrainSaturation,
   buildingsHue,
@@ -39,6 +40,7 @@ export function MoonScene({
   hoveredId: string | null;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
+  cameraTarget?: string | null;
   terrainHue?: number;
   terrainSaturation?: number;
   buildingsHue?: number;
@@ -95,6 +97,7 @@ export function MoonScene({
         <MoonBase
           onSelect={onSelect}
           onHover={onHover}
+          cameraTarget={cameraTarget}
           terrainHue={terrainHue}
           terrainSaturation={terrainSaturation}
           buildingsHue={buildingsHue}

@@ -1,0 +1,120 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import styles from "./section-panel.module.css";
+
+const SECTIONS: Record<string, { title: string; subtitle: string; lines: string[] }> = {
+  Core_ROOT: {
+    title: "CORE",
+    subtitle: "Platform Infrastructure",
+    lines: [
+      "> initializing core modules...",
+      "> nubelab.es — operational systems platform",
+      "> infrastructure, automation, AI workflows",
+      "",
+      "[ STATUS: ONLINE ]",
+      "",
+      "Core systems and platform infrastructure.",
+      "The central hub connecting all NubeLab services.",
+      "",
+      "[ Content pending ]",
+    ],
+  },
+  Author_ROOT: {
+    title: "AUTHOR",
+    subtitle: "Portfolio & Content",
+    lines: [
+      "> loading author profile...",
+      "> portfolio & content authoring",
+      "> technical writing & projects",
+      "",
+      "[ STATUS: ACTIVE ]",
+      "",
+      "Portfolio, technical writing, and project showcase.",
+      "Where ideas become documented reality.",
+      "",
+      "[ Content pending ]",
+    ],
+  },
+  Monitor_ROOT: {
+    title: "MONITOR",
+    subtitle: "Live Server Data",
+    lines: [
+      "> connecting to prometheus...",
+      "> real-time metrics pipeline",
+      "> server telemetry active",
+      "",
+      "[ STATUS: STREAMING ]",
+      "",
+      "Live server monitoring powered by Prometheus.",
+      "Real-time infrastructure observability.",
+      "",
+      "[ API integration pending ]",
+    ],
+  },
+};
+
+function Typewriter({ lines }: { lines: string[] }) {
+  const [typed, setTyped] = useState<string[]>([]);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let idx = 0;
+    const timer = setInterval(() => {
+      if (idx < lines.length) {
+        setTyped((prev) => [...prev, lines[idx]]);
+        idx++;
+      } else {
+        setDone(true);
+        clearInterval(timer);
+      }
+    }, 60);
+    return () => clearInterval(timer);
+  }, [lines]);
+
+  return (
+    <div className={styles.body}>
+      {typed.map((line, i) => (
+        <div key={i} className={styles.line}>
+          {line}
+        </div>
+      ))}
+      {!done && <span className={styles.cursor}>█</span>}
+    </div>
+  );
+}
+
+interface SectionPanelProps {
+  activeId: string | null;
+  onClose: () => void;
+}
+
+export function SectionPanel({ activeId, onClose }: SectionPanelProps) {
+  const isOpen = activeId !== null;
+  const section = activeId ? SECTIONS[activeId] : null;
+
+  return (
+    <div className={`${styles.panel} ${isOpen ? styles.open : ""}`} data-open={isOpen}>
+      <div className={styles.scanlines} />
+      <div className={styles.content}>
+        {section && (
+          <>
+            <div className={styles.header}>
+              <div className={styles.hudCorners}>
+                <div className={styles.headerContent}>
+                  <span className={styles.tag}>MODULE</span>
+                  <h2 className={styles.title}>{section.title}</h2>
+                  <p className={styles.subtitle}>{section.subtitle}</p>
+                </div>
+              </div>
+              <button className={styles.closeBtn} onClick={onClose}>
+                ✕
+              </button>
+            </div>
+            <Typewriter key={activeId} lines={section.lines} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

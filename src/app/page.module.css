@@ -5,65 +5,34 @@
  *   < 400px      small mobile   — stacked, tight
  *   400–767px    mobile         — stacked, 1:1 canvas
  *   768–1023px   tablet         — overlay, adjusted type
- *   ≥ 1024px     desktop        — overlay, full size
- *   ≥ 1440px     wide           — overlay, generous
- *   ≥ 2560px     ultra-wide     — overlay, aspect-limited
+ *   ≥ 1024px     desktop        — sidebar + scene
+ *   ≥ 1440px     wide           — generous spacing
+ *   ≥ 2560px     ultra-wide     — aspect-limited
  * ──────────────────────────────────────────────────── */
 
-/* ── nav (all breakpoints) ────────────────────────── */
+/* ── page layout ─────────────────────────────────── */
 
-.nav {
+.pageLayout {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 28px;
-  height: 48px;
-  border-bottom: 1px solid var(--border-light);
-  background: var(--surface-raised);
-  position: relative;
-  z-index: 10;
+  height: 100svh;
+  overflow: hidden;
 }
 
-.logo {
-  font-family: var(--font-mono-stack);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  white-space: nowrap;
-  flex-shrink: 0;
+/* ── mobile top nav ──────────────────────────────── */
+
+.mobileNav {
+  display: none;
 }
 
-.links {
-  display: flex;
-  gap: 24px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.links a {
-  font-family: var(--font-mono-stack);
-  font-size: 12px;
-  color: var(--muted);
-  text-decoration: none;
-  transition: color 120ms ease;
-}
-
-.links a:hover {
-  color: var(--foreground);
-}
-
-/* ── hero (base — overridden at mobile breakpoints) ─ */
+/* ── hero / scene area ───────────────────────────── */
 
 .hero {
+  flex: 1;
   position: relative;
-  height: calc(100svh - 48px);
+  min-width: 0;
+  overflow: hidden;
+  z-index: 1;
 }
-
-/* ── scene container ──────────────────────────────── */
 
 .sceneContainer {
   position: absolute;
@@ -74,7 +43,7 @@
   background: #000;
 }
 
-/* ── overlay text (desktop + tablet) ──────────────── */
+/* ── overlay text (desktop + tablet) ─────────────── */
 
 .heroText {
   position: absolute;
@@ -101,7 +70,7 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-/* ── tooltip (all breakpoints) ────────────────────── */
+/* ── tooltip (all breakpoints) ───────────────────── */
 
 .tooltip {
   position: absolute;
@@ -120,7 +89,6 @@
 
 /* ═══════════════════════════════════════════════════════
  * TABLET — 768–1023px
- * Still overlay, but tighter spacing and smaller type
  * ═══════════════════════════════════════════════════════ */
 
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -146,7 +114,6 @@
 
 /* ═══════════════════════════════════════════════════════
  * WIDE — ≥ 1440px
- * More generous spacing and type scale
  * ═══════════════════════════════════════════════════════ */
 
 @media (min-width: 1440px) {
@@ -167,7 +134,6 @@
 
 /* ═══════════════════════════════════════════════════════
  * ULTRA-WIDE — ≥ 2560px
- * Letterboxing edges softened with a subtle vignette
  * ═══════════════════════════════════════════════════════ */
 
 @media (min-width: 2560px) {
@@ -185,21 +151,29 @@
 
 /* ═══════════════════════════════════════════════════════
  * MOBILE — < 768px
- * Stacked layout: canvas on top, text below
  * ═══════════════════════════════════════════════════════ */
 
 @media (max-width: 767px) {
-  .nav {
-    padding: 0 16px;
+  .pageLayout {
+    flex-direction: column;
   }
 
-  .links {
-    gap: 16px;
+  .mobileNav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 48px;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--surface-raised);
+    z-index: 10;
+    flex-shrink: 0;
   }
 
   .hero {
     height: auto;
-    min-height: calc(100svh - 48px);
+    min-height: 0;
+    flex: 1;
     display: flex;
     flex-direction: column;
   }
@@ -213,7 +187,6 @@
     flex-shrink: 0;
   }
 
-  /* revert to dark-on-light for the separate text section */
   .heroText {
     position: relative;
     bottom: auto;
@@ -251,34 +224,12 @@
 
 /* ═══════════════════════════════════════════════════════
  * SMALL MOBILE — < 400px
- * Extra-tight spacing, slightly shorter canvas
  * ═══════════════════════════════════════════════════════ */
 
 @media (max-width: 399px) {
-  .nav {
+  .mobileNav {
     padding: 0 12px;
     height: 44px;
-  }
-
-  .logo {
-    font-size: 12px;
-  }
-
-  .links {
-    gap: 10px;
-  }
-
-  .links a {
-    font-size: 11px;
-  }
-
-  .hero {
-    min-height: calc(100svh - 44px);
-  }
-
-  .sceneContainer {
-    aspect-ratio: 4 / 5;
-    max-height: calc(100svh - 44px);
   }
 
   .heroText {
