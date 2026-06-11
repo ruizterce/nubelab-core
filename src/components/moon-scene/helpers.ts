@@ -1,5 +1,8 @@
 import * as THREE from "three";
 
+/** Small margin added to building AABBs so borderline hits aren't rejected */
+const BOUNDS_MARGIN = 0.5;
+
 /**
  * Walk up the object hierarchy to find the root building group.
  * Returns the `*_ROOT` group name, or null if the object belongs to
@@ -19,4 +22,26 @@ export function findBuilding(obj: THREE.Object3D): string | null {
     current = current.parent;
   }
   return null;
+}
+
+/**
+ * Resolve which building was hit, verifying the intersection point
+ * lies within the building's pre-computed bounding box (+ margin).
+ * Returns the building name or null if the hit is too far from the
+ * building's geometry bounds (e.g. platform extensions reaching
+ * across unrelated zones).
+ */
+export function resolveBuilding(
+  obj: THREE.Object3D,
+  point: THREE.Vector3,
+  bounds: Map<string, THREE.Box3>,
+): string | null {
+  const building = findBuilding(obj);
+  if (!building) return null;
+
+  const box = bounds.get(building);
+  if (!box) return building; // no bounds data — accept the hit
+
+  const expanded = box.clone().expandByScalar(BOUNDS_MARGIN);
+  return expanded.containsPoint(point) ? building : null;
 }

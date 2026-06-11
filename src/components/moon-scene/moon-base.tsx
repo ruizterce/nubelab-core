@@ -8,13 +8,16 @@ import {
   type TerrainUniforms,
 } from "../terrain-shader";
 import { MODEL_PATH, HOVER_EMISSIVE } from "./constants";
-import { findBuilding } from "./helpers";
+import { resolveBuilding } from "./helpers";
 import { BuildingLabels } from "./building-labels";
 import { SceneLights } from "./scene-lights";
+import { CameraOrbit } from "./camera-orbit";
+import { HitPlane } from "./hit-plane";
 
 function MoonBase({
   onSelect,
   onHover,
+  cameraTarget,
   terrainHue = -0.45,
   terrainSaturation = 0.7,
   buildingsHue = -0.04,
@@ -22,6 +25,7 @@ function MoonBase({
 }: {
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
+  cameraTarget?: string | null;
   terrainHue?: number;
   terrainSaturation?: number;
   buildingsHue?: number;
@@ -49,27 +53,44 @@ function MoonBase({
     buildingsUniformsRef.current.uTerrainSaturation.value = buildingsSaturation;
   }, [buildingsHue, buildingsSaturation]);
 
+  // tight bounding boxes per building — validated on pointer events
+  const buildingBounds = useRef<Map<string, THREE.Box3>>(new Map());
+
   const model = useMemo(() => {
     const c = scene.clone(true);
+
     c.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        // recompute tight bounding volumes after clone so raycasting
-        // doesn't get false positives from stale/inflated bounds
         if (mesh.geometry) {
           mesh.geometry.computeBoundingSphere();
           mesh.geometry.computeBoundingBox();
         }
-        // invisible meshes (LOD, collision, helpers) shouldn't catch rays
         if (!mesh.visible) {
           mesh.raycast = () => {};
         }
       }
     });
+
     return c;
   }, [scene]);
+
+  useLayoutEffect(() => {
+    const bounds = new Map<string, THREE.Box3>();
+    model.traverse((child) => {
+      if (
+        child.name.endsWith("_ROOT") &&
+        child.name !== "Terrain_ROOT" &&
+        child.name !== "Props_ROOT" &&
+        child.name !== "Lights_ROOT"
+      ) {
+        bounds.set(child.name, new THREE.Box3().setFromObject(child));
+      }
+    });
+    buildingBounds.current = bounds;
+  }, [model]);
 
   // material patching (needs refs, so must run in an effect — not during render)
   // terrain gets one set of uniforms, everything else gets another
@@ -172,17 +193,15 @@ function MoonBase({
 
   return (
     <group>
+      <CameraOrbit target={cameraTarget ?? null} model={model} />
       <BuildingLabels model={model} />
       <SceneLights model={model} />
+      <HitPlane model={model} onSelect={onSelect} />
       <primitive
         ref={modelRef}
         object={model}
-        onClick={(e: ThreeEvent<MouseEvent>) => {
-          const building = findBuilding(e.object as THREE.Object3D);
-          if (building) onSelect(building);
-        }}
         onPointerOver={(e: ThreeEvent<MouseEvent>) => {
-          const building = findBuilding(e.object as THREE.Object3D);
+          const building = resolveBuilding(e.object as THREE.Object3D, e.point, buildingBounds.current);
           if (building) {
             document.body.style.cursor = "pointer";
             applyHover(building);
