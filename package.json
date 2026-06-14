@@ -20,6 +20,7 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "recharts": "^3.8.1",
     "server-only": "latest",
     "three": "^0.184.0",
     "zod": "latest"

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import styles from "./section-panel.module.css";
+import { MonitorPanel } from "./monitor-panel";
 
 const SECTIONS: Record<string, { title: string; subtitle: string; lines: string[] }> = {
   Core_ROOT: {
@@ -39,18 +40,7 @@ const SECTIONS: Record<string, { title: string; subtitle: string; lines: string[
   Monitor_ROOT: {
     title: "MONITOR",
     subtitle: "Live Server Data",
-    lines: [
-      "> connecting to prometheus...",
-      "> real-time metrics pipeline",
-      "> server telemetry active",
-      "",
-      "[ STATUS: STREAMING ]",
-      "",
-      "Live server monitoring powered by Prometheus.",
-      "Real-time infrastructure observability.",
-      "",
-      "[ API integration pending ]",
-    ],
+    lines: [],
   },
 };
 
@@ -111,7 +101,13 @@ export function SectionPanel({ activeId, onClose }: SectionPanelProps) {
                 ✕
               </button>
             </div>
-            <Typewriter key={activeId} lines={section.lines} />
+            {activeId === "Monitor_ROOT" ? (
+              <div className={styles.body}>
+                <MonitorPanel visible={isOpen && activeId === "Monitor_ROOT"} />
+              </div>
+            ) : (
+              <Typewriter key={activeId} lines={section.lines} />
+            )}
           </>
         )}
       </div>
