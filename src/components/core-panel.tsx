@@ -65,8 +65,40 @@ function StatusDot({ status }: { status: "running" | "healthy" }) {
 export function CorePanel() {
   return (
     <div style={{ padding: "0 0 32px" }}>
+      <StaggerFadeIn index={0}>
+        <div style={{ marginBottom: 24 }}>
+          <span
+            style={{
+              fontFamily: "var(--font-mono-stack)",
+              fontSize: 12,
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+              color: "var(--muted)",
+              textTransform: "uppercase",
+              display: "block",
+              marginBottom: 8,
+            }}
+          >
+            About
+          </span>
+          <p
+            style={{
+              fontFamily: "var(--font-mono-stack)",
+              fontSize: 13,
+              lineHeight: 1.8,
+              color: "var(--foreground)",
+              margin: 0,
+            }}
+          >
+            Multi-tenant cloud platform running on a Hetzner CPX22 VPS.
+            Containerized apps orchestrated with Docker, connected via
+            internal networks, and exposed through a central Caddy reverse proxy.
+          </p>
+        </div>
+      </StaggerFadeIn>
+
         {GROUPS.map((group, gi) => (
-          <StaggerFadeIn key={group.name} index={gi}>
+          <StaggerFadeIn key={group.name} index={gi + 1}>
           <div style={{ marginBottom: 24 }}>
           <span
             style={{

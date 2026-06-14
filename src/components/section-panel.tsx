@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import styles from "./section-panel.module.css";
 import { MonitorPanel } from "./monitor-panel";
 import { CorePanel } from "./core-panel";
+import { FounderPanel } from "./founder-panel";
 
 const SECTIONS: Record<string, { title: string; subtitle: string; lines: string[] }> = {
   Core_ROOT: {
@@ -11,21 +12,10 @@ const SECTIONS: Record<string, { title: string; subtitle: string; lines: string[
     subtitle: "Platform Infrastructure",
     lines: [],
   },
-  Author_ROOT: {
-    title: "AUTHOR",
+  Founder_ROOT: {
+    title: "FOUNDER",
     subtitle: "Portfolio & Content",
-    lines: [
-      "> loading author profile...",
-      "",
-      "NubeLab runs on a single VPS at Hetzner,",
-      "serving infrastructure, automation,",
-      "and content from one lunar base.",
-      "",
-      "> n8n.nubelab.es — workflow automation",
-      "> music.nubelab.es — music streaming",
-      "",
-      "[ Content pending ]",
-    ],
+    lines: [],
   },
   Monitor_ROOT: {
     title: "MONITOR",
@@ -98,6 +88,10 @@ export function SectionPanel({ activeId, onClose }: SectionPanelProps) {
             ) : activeId === "Core_ROOT" ? (
               <div className={styles.body}>
                 <CorePanel />
+              </div>
+            ) : activeId === "Founder_ROOT" ? (
+              <div className={styles.body}>
+                <FounderPanel />
               </div>
             ) : (
               <Typewriter key={activeId} lines={section.lines} />

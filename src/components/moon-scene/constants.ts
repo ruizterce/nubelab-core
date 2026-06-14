@@ -22,7 +22,7 @@ export const ASPECT_LIMIT = 3.0;
 /** Per-building label offsets in world units [x, y, z] */
 export const LABEL_OFFSETS: Record<string, [number, number, number]> = {
   Core: [2.5, 0, 0],
-  Author: [2, 0, 0],
+  Founder: [2, 0, 0],
   Monitor: [3, 0.2, 0],
 };
 

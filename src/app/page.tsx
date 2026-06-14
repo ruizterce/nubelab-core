@@ -12,7 +12,7 @@ const MoonScene = dynamic(
   { ssr: false }
 );
 
-const BUILDINGS = ["Core_ROOT", "Author_ROOT", "Monitor_ROOT"];
+const BUILDINGS = ["Core_ROOT", "Founder_ROOT", "Monitor_ROOT"];
 
 export default function Page() {
   const [activeId, setActiveId] = useState<string | null>(null);

@@ -4,7 +4,7 @@ import styles from "./nav-sidebar.module.css";
 
 const BUILDINGS = [
   { id: "Core_ROOT", label: "Core" },
-  { id: "Author_ROOT", label: "Author" },
+  { id: "Founder_ROOT", label: "Founder" },
   { id: "Monitor_ROOT", label: "Monitor" },
 ] as const;
 
