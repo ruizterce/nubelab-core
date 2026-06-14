@@ -3,36 +3,26 @@
 import { useEffect, useState } from "react";
 import styles from "./section-panel.module.css";
 import { MonitorPanel } from "./monitor-panel";
+import { CorePanel } from "./core-panel";
 
 const SECTIONS: Record<string, { title: string; subtitle: string; lines: string[] }> = {
   Core_ROOT: {
     title: "CORE",
     subtitle: "Platform Infrastructure",
-    lines: [
-      "> initializing core modules...",
-      "> nubelab.es — operational systems platform",
-      "> infrastructure, automation, AI workflows",
-      "",
-      "[ STATUS: ONLINE ]",
-      "",
-      "Core systems and platform infrastructure.",
-      "The central hub connecting all NubeLab services.",
-      "",
-      "[ Content pending ]",
-    ],
+    lines: [],
   },
   Author_ROOT: {
     title: "AUTHOR",
     subtitle: "Portfolio & Content",
     lines: [
       "> loading author profile...",
-      "> portfolio & content authoring",
-      "> technical writing & projects",
       "",
-      "[ STATUS: ACTIVE ]",
+      "NubeLab runs on a single VPS at Hetzner,",
+      "serving infrastructure, automation,",
+      "and content from one lunar base.",
       "",
-      "Portfolio, technical writing, and project showcase.",
-      "Where ideas become documented reality.",
+      "> n8n.nubelab.es — workflow automation",
+      "> music.nubelab.es — music streaming",
       "",
       "[ Content pending ]",
     ],
@@ -104,6 +94,10 @@ export function SectionPanel({ activeId, onClose }: SectionPanelProps) {
             {activeId === "Monitor_ROOT" ? (
               <div className={styles.body}>
                 <MonitorPanel visible={isOpen && activeId === "Monitor_ROOT"} />
+              </div>
+            ) : activeId === "Core_ROOT" ? (
+              <div className={styles.body}>
+                <CorePanel />
               </div>
             ) : (
               <Typewriter key={activeId} lines={section.lines} />

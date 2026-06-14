@@ -107,6 +107,13 @@ select {
   }
 }
 
+@keyframes stagger-fade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ── 3D building labels ──────────────────────────── */
 
 .building-label {
