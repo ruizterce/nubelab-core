@@ -11,6 +11,7 @@ services:
       API_BASE_URL: http://nubelab-api:4000
     networks:
       - proxy_net
+      - shared_net
     healthcheck:
       test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
       interval: 30s
@@ -20,4 +21,6 @@ services:
 
 networks:
   proxy_net:
+    external: true
+  shared_net:
     external: true
