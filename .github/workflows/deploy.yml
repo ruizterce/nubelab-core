@@ -57,6 +57,7 @@ jobs:
               "name: nubelab-core" \
               "services:" \
               "  web:" \
+              "    container_name: nubelab-core" \
               "    image: ghcr.io/${{ github.repository }}:latest" \
               "    environment:" \
               "      NODE_ENV: production" \

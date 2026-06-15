@@ -3,6 +3,7 @@ name: nubelab-core
 services:
   web:
     image: ${IMAGE_PREFIX}/nubelab-core:latest
+    container_name: nubelab-core
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_SITE_URL: https://${DOMAIN}
