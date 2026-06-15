@@ -9,6 +9,8 @@ RUN npm ci
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ARG API_BASE_URL=http://127.0.0.1:4000
+ENV API_BASE_URL=${API_BASE_URL}
 RUN npm run build
 
 FROM node:24-alpine AS runner

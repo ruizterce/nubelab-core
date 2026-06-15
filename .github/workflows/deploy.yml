@@ -38,6 +38,8 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: true
+          build-args: |
+            API_BASE_URL=http://nubelab-api:4000
           tags: |
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
