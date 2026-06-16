@@ -15,7 +15,7 @@ export function HitPlane({
   onSelect,
 }: {
   model: THREE.Group;
-  onSelect: (id: string) => void;
+  onSelect: (id: string | null) => void;
 }) {
   const { camera, gl } = useThree();
 
@@ -50,7 +50,11 @@ export function HitPlane({
       }
     }
 
-    if (best && bestDist < MAX_HIT_DIST) onSelect(best);
+    if (best && bestDist < MAX_HIT_DIST) {
+      onSelect(best);
+    } else {
+      onSelect(null);
+    }
   };
 
   return (

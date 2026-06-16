@@ -38,7 +38,7 @@ export function MoonScene({
 }: {
   activeId: string | null;
   hoveredId: string | null;
-  onSelect: (id: string) => void;
+  onSelect: (id: string | null) => void;
   onHover: (id: string | null) => void;
   cameraTarget?: string | null;
   terrainHue?: number;

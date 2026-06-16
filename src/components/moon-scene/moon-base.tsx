@@ -23,7 +23,7 @@ function MoonBase({
   buildingsHue = -0.04,
   buildingsSaturation = 0.8,
 }: {
-  onSelect: (id: string) => void;
+  onSelect: (id: string | null) => void;
   onHover: (id: string | null) => void;
   cameraTarget?: string | null;
   terrainHue?: number;
