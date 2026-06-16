@@ -11,6 +11,9 @@ export function StatusBar() {
         <span className="status-bar-text" aria-hidden>
           {TEXT}
         </span>
+        <span className="status-bar-text" aria-hidden>
+          {TEXT}
+        </span>
       </div>
     </div>
   );

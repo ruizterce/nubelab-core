@@ -103,7 +103,7 @@ select {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-50% - 24px));
+    transform: translateX(calc(-33.333% - 32px));
   }
 }
 

@@ -2,12 +2,11 @@ import { useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
+import { buildBuildingBounds } from "./building-utils";
 
 const MAX_HIT_DIST = 50;
-const SKIP = new Set(["Terrain_ROOT", "Props_ROOT", "Lights_ROOT"]);
 const _raycaster = new THREE.Raycaster();
 const _mouse = new THREE.Vector2();
-const _box = new THREE.Box3();
 const _intersection = new THREE.Vector3();
 
 export function HitPlane({
@@ -18,16 +17,7 @@ export function HitPlane({
   onSelect: (id: string | null) => void;
 }) {
   const { camera, gl } = useThree();
-
-  const bounds = useMemo(() => {
-    const map = new Map<string, THREE.Box3>();
-    model.traverse((child) => {
-      if (child.name.endsWith("_ROOT") && !SKIP.has(child.name)) {
-        map.set(child.name, new THREE.Box3().setFromObject(child));
-      }
-    });
-    return map;
-  }, [model]);
+  const bounds = useMemo(() => buildBuildingBounds(model), [model]);
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();

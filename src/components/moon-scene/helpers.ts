@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { NON_INTERACTIVE_ROOTS } from "./constants";
 
 /** Small margin added to building AABBs so borderline hits aren't rejected */
 const BOUNDS_MARGIN = 0.5;
@@ -6,18 +7,12 @@ const BOUNDS_MARGIN = 0.5;
 /**
  * Walk up the object hierarchy to find the root building group.
  * Returns the `*_ROOT` group name, or null if the object belongs to
- * Terrain_ROOT, Props_ROOT, or Lights_ROOT (non-interactive).
+ * a non-interactive group (Terrain, Props, Lights).
  */
 export function findBuilding(obj: THREE.Object3D): string | null {
   let current: THREE.Object3D | null = obj;
   while (current) {
-    if (
-      current.name === "Terrain_ROOT" ||
-      current.name === "Props_ROOT" ||
-      current.name === "Lights_ROOT"
-    ) {
-      return null;
-    }
+    if (NON_INTERACTIVE_ROOTS.has(current.name)) return null;
     if (current.name.endsWith("_ROOT")) return current.name;
     current = current.parent;
   }
@@ -28,8 +23,7 @@ export function findBuilding(obj: THREE.Object3D): string | null {
  * Resolve which building was hit, verifying the intersection point
  * lies within the building's pre-computed bounding box (+ margin).
  * Returns the building name or null if the hit is too far from the
- * building's geometry bounds (e.g. platform extensions reaching
- * across unrelated zones).
+ * building's geometry bounds.
  */
 export function resolveBuilding(
   obj: THREE.Object3D,
@@ -40,7 +34,7 @@ export function resolveBuilding(
   if (!building) return null;
 
   const box = bounds.get(building);
-  if (!box) return building; // no bounds data — accept the hit
+  if (!box) return building;
 
   const expanded = box.clone().expandByScalar(BOUNDS_MARGIN);
   return expanded.containsPoint(point) ? building : null;

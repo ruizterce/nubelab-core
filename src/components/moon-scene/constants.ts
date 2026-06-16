@@ -7,6 +7,16 @@ export const MODEL_PATH = "/3d-models/moon-base.glb";
 /* ── interaction ─────────────────────────────────── */
 
 export const HOVER_EMISSIVE = "#dbb474";
+export const HOVER_EMISSIVE_INTENSITY = 0.6;
+export const HOVER_LIFT = 0.05;
+export const HOVER_LERP_SPEED = 6;
+
+/** Non-interactive building groups excluded from selection and hit-testing */
+export const NON_INTERACTIVE_ROOTS = new Set([
+  "Terrain_ROOT",
+  "Props_ROOT",
+  "Lights_ROOT",
+]);
 
 /* ── camera ──────────────────────────────────────── */
 

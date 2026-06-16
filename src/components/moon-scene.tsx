@@ -13,7 +13,6 @@ import {
   Pixelation,
 } from "@react-three/postprocessing";
 import { ToneMappingMode } from "postprocessing";
-import * as THREE from "three";
 import {
   ASPECT_LIMIT,
   DPR,
@@ -36,8 +35,6 @@ export function MoonScene({
   buildingsHue,
   buildingsSaturation,
 }: {
-  activeId: string | null;
-  hoveredId: string | null;
   onSelect: (id: string | null) => void;
   onHover: (id: string | null) => void;
   cameraTarget?: string | null;

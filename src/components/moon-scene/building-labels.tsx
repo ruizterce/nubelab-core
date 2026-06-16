@@ -2,29 +2,18 @@ import { useMemo } from "react";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { LABEL_OFFSETS } from "./constants";
+import { findBuildingRoots } from "./building-utils";
 
 function BuildingLabels({ model }: { model: THREE.Group }) {
   const buildings = useMemo(() => {
-    const result: {
-      name: string;
-      position: [number, number, number];
-    }[] = [];
-    model.traverse((child) => {
-      if (
-        child.name.endsWith("_ROOT") &&
-        child.name !== "Terrain_ROOT" &&
-        child.name !== "Props_ROOT" &&
-        child.name !== "Lights_ROOT"
-      ) {
-        const center = new THREE.Vector3();
-        child.getWorldPosition(center);
-        result.push({
-          name: child.name.replace("_ROOT", ""),
-          position: [center.x, center.y, center.z],
-        });
-      }
+    return findBuildingRoots(model).map((child) => {
+      const center = new THREE.Vector3();
+      child.getWorldPosition(center);
+      return {
+        name: child.name.replace("_ROOT", ""),
+        position: [center.x, center.y, center.z] as [number, number, number],
+      };
     });
-    return result;
   }, [model]);
 
   return (
@@ -53,4 +42,4 @@ function BuildingLabels({ model }: { model: THREE.Group }) {
   );
 }
 
-export { BuildingLabels, LABEL_OFFSETS };
+export { BuildingLabels };

@@ -1,17 +1,15 @@
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { NON_INTERACTIVE_ROOTS } from "./constants";
 
 const LERP_SPEED = 3;
 
-// ── AJUSTA ESTE OFFSET ────────────────────────────
-// Compensación en XY cuando el sidebar lateral está visible.
-// Cambia los valores hasta que el edificio no quede tapado.
+// Offset to compensate for the sidebar on desktop.
+// Adjust until the building is centered in the visible area.
 const _offset = new THREE.Vector3(1, 5, -1);
-// ───────────────────────────────────────────────────
 
 const _buildingPos = new THREE.Vector3();
-const SKIP = new Set(["Terrain_ROOT", "Props_ROOT", "Lights_ROOT"]);
 
 export function CameraOrbit({
   target,
@@ -35,7 +33,7 @@ export function CameraOrbit({
       originalPos.current.copy(camera.position);
 
       model.traverse((child) => {
-        if (child.name.endsWith("_ROOT") && !SKIP.has(child.name)) {
+        if (child.name.endsWith("_ROOT") && !NON_INTERACTIVE_ROOTS.has(child.name)) {
           child.getWorldPosition(_buildingPos);
           positions.current.set(
             child.name,

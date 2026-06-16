@@ -7,12 +7,13 @@ import {
   patchTerrainMaterial,
   type TerrainUniforms,
 } from "../terrain-shader";
-import { MODEL_PATH, HOVER_EMISSIVE } from "./constants";
+import { MODEL_PATH, HOVER_EMISSIVE, HOVER_EMISSIVE_INTENSITY, HOVER_LIFT, HOVER_LERP_SPEED, NON_INTERACTIVE_ROOTS } from "./constants";
 import { resolveBuilding } from "./helpers";
 import { BuildingLabels } from "./building-labels";
 import { SceneLights } from "./scene-lights";
 import { CameraOrbit } from "./camera-orbit";
 import { HitPlane } from "./hit-plane";
+import { buildBuildingBounds } from "./building-utils";
 
 function MoonBase({
   onSelect,
@@ -81,18 +82,7 @@ function MoonBase({
   }, [scene]);
 
   useLayoutEffect(() => {
-    const bounds = new Map<string, THREE.Box3>();
-    model.traverse((child) => {
-      if (
-        child.name.endsWith("_ROOT") &&
-        child.name !== "Terrain_ROOT" &&
-        child.name !== "Props_ROOT" &&
-        child.name !== "Lights_ROOT"
-      ) {
-        bounds.set(child.name, new THREE.Box3().setFromObject(child));
-      }
-    });
-    buildingBounds.current = bounds;
+    buildingBounds.current = buildBuildingBounds(model);
   }, [model]);
 
   // material patching (needs refs, so must run in an effect — not during render)
@@ -153,7 +143,7 @@ function MoonBase({
     // save original positions on first frame
     if (origPositions.current.size === 0) {
       modelRef.current.traverse((child) => {
-        if (child.name.endsWith("_ROOT") && !["Terrain_ROOT", "Props_ROOT", "Lights_ROOT"].includes(child.name)) {
+        if (child.name.endsWith("_ROOT") && !NON_INTERACTIVE_ROOTS.has(child.name)) {
           origPositions.current.set(child.name, child.position.clone());
         }
       });
@@ -164,8 +154,8 @@ function MoonBase({
       const name = hoverBuilding.current.name;
       const orig = origPositions.current.get(name);
       if (orig) {
-        const goal = hoverActive.current ? orig.z + 0.05 : orig.z;
-        const t = 1 - Math.exp(-6 * delta);
+        const goal = hoverActive.current ? orig.z + HOVER_LIFT : orig.z;
+        const t = 1 - Math.exp(-HOVER_LERP_SPEED * delta);
         hoverBuilding.current.position.z += (goal - hoverBuilding.current.position.z) * t;
       }
     }
@@ -209,7 +199,7 @@ function MoonBase({
                 singleMat as unknown as THREE.MeshStandardMaterial
               ).clone();
               cloned.emissive = new THREE.Color(HOVER_EMISSIVE);
-              cloned.emissiveIntensity = 0.6;
+              cloned.emissiveIntensity = HOVER_EMISSIVE_INTENSITY;
               mesh.material = cloned;
             }
           }

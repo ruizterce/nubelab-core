@@ -81,8 +81,6 @@ export default function Page() {
         <div className={styles.sceneContainer}>
           <Suspense fallback={null}>
             <MoonScene
-              activeId={activeId}
-              hoveredId={hoveredId}
               cameraTarget={activeId}
               onSelect={handleSelect}
               onHover={setHoveredId}

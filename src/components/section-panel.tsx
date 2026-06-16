@@ -1,58 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import styles from "./section-panel.module.css";
 import { MonitorPanel } from "./monitor-panel";
 import { CorePanel } from "./core-panel";
 import { FounderPanel } from "./founder-panel";
 
-const SECTIONS: Record<string, { title: string; subtitle: string; lines: string[] }> = {
-  Core_ROOT: {
-    title: "CORE",
-    subtitle: "Platform Infrastructure",
-    lines: [],
-  },
-  Founder_ROOT: {
-    title: "FOUNDER",
-    subtitle: "Portfolio & Content",
-    lines: [],
-  },
-  Monitor_ROOT: {
-    title: "MONITOR",
-    subtitle: "Live Server Data",
-    lines: [],
-  },
+const SECTIONS: Record<string, { title: string; subtitle: string }> = {
+  Core_ROOT: { title: "CORE", subtitle: "Platform Infrastructure" },
+  Founder_ROOT: { title: "FOUNDER", subtitle: "Portfolio & Content" },
+  Monitor_ROOT: { title: "MONITOR", subtitle: "Live Server Data" },
 };
 
-function Typewriter({ lines }: { lines: string[] }) {
-  const [typed, setTyped] = useState<string[]>([]);
-  const [done, setDone] = useState(false);
-
-  useEffect(() => {
-    let idx = 0;
-    const timer = setInterval(() => {
-      if (idx < lines.length) {
-        setTyped((prev) => [...prev, lines[idx]]);
-        idx++;
-      } else {
-        setDone(true);
-        clearInterval(timer);
-      }
-    }, 60);
-    return () => clearInterval(timer);
-  }, [lines]);
-
-  return (
-    <div className={styles.body}>
-      {typed.map((line, i) => (
-        <div key={i} className={styles.line}>
-          {line}
-        </div>
-      ))}
-      {!done && <span className={styles.cursor}>█</span>}
-    </div>
-  );
-}
+const SECTION_PANELS: Record<string, React.FC<{ visible?: boolean }>> = {
+  Core_ROOT: CorePanel,
+  Founder_ROOT: FounderPanel,
+  Monitor_ROOT: ({ visible }) => <MonitorPanel visible={!!visible} />,
+};
 
 interface SectionPanelProps {
   activeId: string | null;
@@ -62,6 +25,7 @@ interface SectionPanelProps {
 export function SectionPanel({ activeId, onClose }: SectionPanelProps) {
   const isOpen = activeId !== null;
   const section = activeId ? SECTIONS[activeId] : null;
+  const Panel = activeId ? SECTION_PANELS[activeId] : null;
 
   return (
     <div className={`${styles.panel} ${isOpen ? styles.open : ""}`} data-open={isOpen}>
@@ -81,20 +45,10 @@ export function SectionPanel({ activeId, onClose }: SectionPanelProps) {
                 ✕
               </button>
             </div>
-            {activeId === "Monitor_ROOT" ? (
+            {Panel && (
               <div className={styles.body}>
-                <MonitorPanel visible={isOpen && activeId === "Monitor_ROOT"} />
+                <Panel visible={isOpen} />
               </div>
-            ) : activeId === "Core_ROOT" ? (
-              <div className={styles.body}>
-                <CorePanel />
-              </div>
-            ) : activeId === "Founder_ROOT" ? (
-              <div className={styles.body}>
-                <FounderPanel />
-              </div>
-            ) : (
-              <Typewriter key={activeId} lines={section.lines} />
             )}
           </>
         )}
