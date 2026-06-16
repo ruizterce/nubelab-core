@@ -1,6 +1,6 @@
 import { useMemo, useLayoutEffect, useRef, useCallback } from "react";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
-import type { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import {
   createTerrainUniforms,
@@ -35,6 +35,9 @@ function MoonBase({
   const modelRef = useRef<THREE.Group>(null);
   const originals = useRef<Map<string, THREE.Material>>(new Map());
   const prevHovered = useRef<string | null>(null);
+  const origPositions = useRef<Map<string, THREE.Vector3>>(new Map());
+  const hoverBuilding = useRef<THREE.Object3D | null>(null);
+  const hoverActive = useRef(false);
 
   // shared uniforms for terrain materials
   const terrainUniformsRef = useRef<TerrainUniforms>(createTerrainUniforms());
@@ -144,6 +147,30 @@ function MoonBase({
     });
   }, [model]);
 
+  useFrame((_, delta) => {
+    if (!modelRef.current) return;
+
+    // save original positions on first frame
+    if (origPositions.current.size === 0) {
+      modelRef.current.traverse((child) => {
+        if (child.name.endsWith("_ROOT") && !["Terrain_ROOT", "Props_ROOT", "Lights_ROOT"].includes(child.name)) {
+          origPositions.current.set(child.name, child.position.clone());
+        }
+      });
+    }
+
+    // lerp hovered building
+    if (hoverBuilding.current) {
+      const name = hoverBuilding.current.name;
+      const orig = origPositions.current.get(name);
+      if (orig) {
+        const goal = hoverActive.current ? orig.z + 0.05 : orig.z;
+        const t = 1 - Math.exp(-6 * delta);
+        hoverBuilding.current.position.z += (goal - hoverBuilding.current.position.z) * t;
+      }
+    }
+  });
+
   const applyHover = useCallback((buildingName: string | null) => {
     const root = modelRef.current;
     if (!root) return;
@@ -161,6 +188,7 @@ function MoonBase({
         });
       }
       prevHovered.current = null;
+      hoverActive.current = false;
     }
 
     // apply new — clone material per mesh so shared materials don't bleed
@@ -186,6 +214,8 @@ function MoonBase({
             }
           }
         });
+        hoverBuilding.current = building;
+        hoverActive.current = true;
         prevHovered.current = buildingName;
       }
     }

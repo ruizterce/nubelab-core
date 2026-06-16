@@ -6,7 +6,7 @@ export const MODEL_PATH = "/3d-models/moon-base.glb";
 
 /* ── interaction ─────────────────────────────────── */
 
-export const HOVER_EMISSIVE = "#74db81";
+export const HOVER_EMISSIVE = "#dbb474";
 
 /* ── camera ──────────────────────────────────────── */
 
