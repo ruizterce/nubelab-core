@@ -29,6 +29,8 @@ export function CameraOrbit({
 
   useFrame((_, delta) => {
     if (!hasInit.current) {
+      const isDefault = camera.position.x === 0 && camera.position.y === 0 && camera.position.z === 5;
+      if (isDefault) return;
       hasInit.current = true;
       originalPos.current.copy(camera.position);
 
