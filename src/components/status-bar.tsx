@@ -1,11 +1,15 @@
 "use client";
 
+const TEXT =
+  "CLOUD PLATFORM OPERATIONAL  |  UPLINK: ACTIVE  |  MODULES: 20 ONLINE  |  SECTOR: NOMINAL  |  NUBELAB CORE v1.0  |  SYSTEM: ALL GREEN";
+
 export function StatusBar() {
   return (
     <div className="status-bar">
       <div className="status-bar-track">
-        <span className="status-bar-text">
-          LUNAR BASE OPERATIONAL&ensp;|&ensp;UPLINK: ACTIVE&ensp;|&ensp;MODULES: 3 ONLINE&ensp;|&ensp;SECTOR: NOMINAL&ensp;|&ensp;NUBELAB CORE v1.0&ensp;|&ensp;SYSTEM: ALL GREEN&ensp;|&ensp;LUNAR BASE OPERATIONAL&ensp;|&ensp;UPLINK: ACTIVE&ensp;|&ensp;MODULES: 3 ONLINE&ensp;|&ensp;SECTOR: NOMINAL&ensp;|&ensp;NUBELAB CORE v1.0&ensp;|&ensp;SYSTEM: ALL GREEN
+        <span className="status-bar-text">{TEXT}</span>
+        <span className="status-bar-text" aria-hidden>
+          {TEXT}
         </span>
       </div>
     </div>
