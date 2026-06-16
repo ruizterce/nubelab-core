@@ -43,11 +43,12 @@ vec3 nubelab_hsl2rgb(vec3 hsl) {
 /* ── injected inside main(), after color_fragment ──── */
 const ADJUST_AFTER_COLOR = /* glsl */ `
 
-// Apply hue shift and saturation multiplier to diffuseColor
+// Apply hue shift, saturation multiplier, and lightness offset to diffuseColor
 {
     vec3 _hsl = nubelab_rgb2hsl(diffuseColor.rgb);
     _hsl.x = mod(_hsl.x + uTerrainHue, 1.0);
     _hsl.y = clamp(_hsl.y * uTerrainSaturation, 0.0, 1.0);
+    _hsl.z = clamp(_hsl.z + uTerrainLightness, 0.0, 1.0);
     diffuseColor.rgb = nubelab_hsl2rgb(_hsl);
 }
 `;
@@ -56,6 +57,7 @@ const ADJUST_AFTER_COLOR = /* glsl */ `
 const UNIFORM_DECL = /* glsl */ `
 uniform float uTerrainHue;
 uniform float uTerrainSaturation;
+uniform float uTerrainLightness;
 `;
 
 /* ───────────────────────────────────────────────────────
@@ -65,6 +67,7 @@ uniform float uTerrainSaturation;
 export interface TerrainUniforms {
   uTerrainHue: THREE.Uniform<number>;
   uTerrainSaturation: THREE.Uniform<number>;
+  uTerrainLightness: THREE.Uniform<number>;
 }
 
 /** Create shared uniforms initialised to identity values. */
@@ -72,6 +75,7 @@ export function createTerrainUniforms(): TerrainUniforms {
   return {
     uTerrainHue: new THREE.Uniform(0),
     uTerrainSaturation: new THREE.Uniform(1),
+    uTerrainLightness: new THREE.Uniform(0),
   };
 }
 
@@ -91,6 +95,7 @@ export function patchTerrainMaterial(
     // 1. Register uniforms so Three.js uploads them to the GPU
     shader.uniforms.uTerrainHue = uniforms.uTerrainHue;
     shader.uniforms.uTerrainSaturation = uniforms.uTerrainSaturation;
+    shader.uniforms.uTerrainLightness = uniforms.uTerrainLightness;
 
     // 2. Inject uniform declarations at the top of the shader
     shader.fragmentShader = UNIFORM_DECL + shader.fragmentShader;

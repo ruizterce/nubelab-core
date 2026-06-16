@@ -32,16 +32,20 @@ export function MoonScene({
   cameraTarget,
   terrainHue,
   terrainSaturation,
+  terrainLightness,
   buildingsHue,
   buildingsSaturation,
+  buildingsLightness,
 }: {
   onSelect: (id: string | null) => void;
   onHover: (id: string | null) => void;
   cameraTarget?: string | null;
   terrainHue?: number;
   terrainSaturation?: number;
+  terrainLightness?: number;
   buildingsHue?: number;
   buildingsSaturation?: number;
+  buildingsLightness?: number;
 }) {
   const { chromaticAberration, noiseOpacity, pixelationGranularity, bloom, toneMapping, vignette } =
     POST_PROCESSING;
@@ -97,8 +101,10 @@ export function MoonScene({
           cameraTarget={cameraTarget}
           terrainHue={terrainHue}
           terrainSaturation={terrainSaturation}
+          terrainLightness={terrainLightness}
           buildingsHue={buildingsHue}
           buildingsSaturation={buildingsSaturation}
+          buildingsLightness={buildingsLightness}
         />
       </Canvas>
     </div>

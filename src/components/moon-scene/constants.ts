@@ -116,8 +116,8 @@ export const MOON = {
   yOffset: 0,
   xOffset: 0,
   cycleSeconds: 16,
-  maxIntensity: 2,
-  color: "#6688cc",
+  maxIntensity: 1,
+  color: "#849dce",
 } as const;
 
 /* ── shadow maps ─────────────────────────────────── */
@@ -153,10 +153,10 @@ export const POST_PROCESSING = {
   noiseOpacity: 0.03,
   pixelationGranularity: 0.5,
   bloom: {
-    luminanceThreshold: 0.7,
+    luminanceThreshold: 0.55,
     luminanceSmoothing: 0.02,
     intensity: 1.3,
-    radius: 0.65,
+    radius: 0.66,
   },
   toneMapping: {
     mode: "ACES_FILMIC" as const,

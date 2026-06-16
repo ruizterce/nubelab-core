@@ -6,7 +6,7 @@ import {
   createTerrainUniforms,
   patchTerrainMaterial,
   type TerrainUniforms,
-} from "../terrain-shader";
+} from "./terrain-shader";
 import { MODEL_PATH, HOVER_EMISSIVE, HOVER_EMISSIVE_INTENSITY, HOVER_LIFT, HOVER_LERP_SPEED, NON_INTERACTIVE_ROOTS } from "./constants";
 import { resolveBuilding } from "./helpers";
 import { BuildingLabels } from "./building-labels";
@@ -19,18 +19,22 @@ function MoonBase({
   onSelect,
   onHover,
   cameraTarget,
-  terrainHue = -0.45,
-  terrainSaturation = 0.7,
+  terrainHue = -0.42,
+  terrainSaturation = 0.3,
+  terrainLightness = -0.2,
   buildingsHue = -0.04,
   buildingsSaturation = 0.8,
+  buildingsLightness = 0,
 }: {
   onSelect: (id: string | null) => void;
   onHover: (id: string | null) => void;
   cameraTarget?: string | null;
   terrainHue?: number;
   terrainSaturation?: number;
+  terrainLightness?: number;
   buildingsHue?: number;
   buildingsSaturation?: number;
+  buildingsLightness?: number;
 }) {
   const { scene } = useGLTF(MODEL_PATH);
   const modelRef = useRef<THREE.Group>(null);
@@ -50,12 +54,14 @@ function MoonBase({
   useLayoutEffect(() => {
     terrainUniformsRef.current.uTerrainHue.value = terrainHue;
     terrainUniformsRef.current.uTerrainSaturation.value = terrainSaturation;
-  }, [terrainHue, terrainSaturation]);
+    terrainUniformsRef.current.uTerrainLightness.value = terrainLightness;
+  }, [terrainHue, terrainSaturation, terrainLightness]);
 
   useLayoutEffect(() => {
     buildingsUniformsRef.current.uTerrainHue.value = buildingsHue;
     buildingsUniformsRef.current.uTerrainSaturation.value = buildingsSaturation;
-  }, [buildingsHue, buildingsSaturation]);
+    buildingsUniformsRef.current.uTerrainLightness.value = buildingsLightness;
+  }, [buildingsHue, buildingsSaturation, buildingsLightness]);
 
   // tight bounding boxes per building — validated on pointer events
   const buildingBounds = useRef<Map<string, THREE.Box3>>(new Map());
