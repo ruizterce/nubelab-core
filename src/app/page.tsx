@@ -90,7 +90,7 @@ export default function Page() {
           </Suspense>
         </div>
         <div className={styles.heroText}>
-          <h1>Operational Systems Platform</h1>
+          <h1>Welcome to Nubelab</h1>
           <p>A cloud lab for systems, infrastructure and operations</p>
         </div>
       </main>

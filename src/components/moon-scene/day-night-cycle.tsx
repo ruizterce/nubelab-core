@@ -78,11 +78,9 @@ function DayNightCycle() {
         shadow-radius={MOON_SHADOW.radius}
       />
       <mesh ref={sunDotRef}>
-        <sphereGeometry args={[1, 16, 16]} />
         <meshBasicMaterial color="yellow" />
       </mesh>
       <mesh ref={moonDotRef}>
-        <sphereGeometry args={[0.8, 16, 16]} />
         <meshBasicMaterial color={MOON.color} />
       </mesh>
     </>

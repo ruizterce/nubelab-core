@@ -4,8 +4,8 @@ import styles from "./nav-sidebar.module.css";
 
 const BUILDINGS = [
   { id: "Core_ROOT", label: "Core" },
-  { id: "Founder_ROOT", label: "Founder" },
   { id: "Monitor_ROOT", label: "Monitor" },
+  { id: "Founder_ROOT", label: "Founder" },
 ] as const;
 
 interface NavSidebarProps {
