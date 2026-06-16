@@ -31,7 +31,7 @@ export function FounderPanel() {
       <StaggerFadeIn index={0}>
         <div style={{ marginBottom: 24 }}>
           <span style={sectionLabel}>About</span>
-          <p style={{ fontFamily: "var(--font-mono-stack)", fontSize: 13, lineHeight: 1.8, color: "var(--foreground)", margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-sans-stack)", fontSize: 13, lineHeight: 1.8, color: "var(--foreground)", margin: 0 }}>
             <strong>Nubelab</strong> is a personal project by{" "}
             <a href="https://github.com/ruizterce" target="_blank" rel="noreferrer" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>
               ruizterce
@@ -51,7 +51,7 @@ export function FounderPanel() {
                 href={link.url}
                 target="_blank"
                 rel="noreferrer"
-                style={{ ...card, fontFamily: "var(--font-mono-stack)", fontWeight: 600, color: "var(--accent)", textDecoration: "none", transition: "background 120ms ease" }}
+                style={{ ...card, fontWeight: 600, color: "var(--accent)", textDecoration: "none", transition: "background 120ms ease" }}
               >
                 <span style={{ ...iconBox, color: "var(--accent)" }}>{link.icon}</span>
                 {link.label}

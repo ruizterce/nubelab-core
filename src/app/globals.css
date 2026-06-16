@@ -24,7 +24,8 @@
   --glow-color: #74db81;
 
   --font-mono-stack: var(--font-mono), "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  --font-sans-stack: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans-stack: var(--font-body), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading-stack: var(--font-heading), var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
 
 * {
@@ -44,6 +45,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans-stack);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading-stack);
 }
 
 a {

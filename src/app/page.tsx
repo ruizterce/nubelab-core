@@ -52,7 +52,7 @@ export default function Page() {
       <NavSidebar activeId={activeId} onSelect={handleSelect} />
 
       <div className={styles.mobileNav}>
-        <span className="font-mono" style={{ fontSize: 13, fontWeight: 700, color: "var(--accent)" }}>
+        <span style={{ fontFamily: "var(--font-heading-stack)", fontSize: 13, fontWeight: 700, color: "var(--accent)" }}>
           NubeLab
         </span>
         <ul style={{ display: "flex", gap: 16, listStyle: "none", margin: 0, padding: 0 }}>
@@ -63,7 +63,7 @@ export default function Page() {
                 style={{
                   background: "none",
                   border: "none",
-                  fontFamily: "var(--font-mono-stack)",
+                  fontFamily: "var(--font-sans-stack)",
                   fontSize: 12,
                   color: activeId === id ? "var(--accent)" : "var(--muted)",
                   cursor: "pointer",

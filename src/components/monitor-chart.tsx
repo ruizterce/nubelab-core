@@ -115,7 +115,7 @@ export function MonitorChart({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontFamily: "var(--font-mono-stack)",
+              fontFamily: "var(--font-sans-stack)",
               fontSize: 12,
               color: "var(--muted)",
             }}

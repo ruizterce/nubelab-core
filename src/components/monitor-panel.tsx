@@ -6,7 +6,7 @@ import { StaggerFadeIn } from "./stagger-fade-in";
 import { sectionLabel } from "./panel-styles";
 
 const statLabel = { ...sectionLabel, marginBottom: 6 };
-const statValue = { fontFamily: "var(--font-mono-stack)", fontSize: 18, fontWeight: 700 as const };
+const statValue = { fontFamily: "var(--font-heading-stack)", fontSize: 18, fontWeight: 700 as const };
 
 export function MonitorPanel({ visible }: { visible: boolean }) {
   const data = useMonitorData(visible);
@@ -19,7 +19,7 @@ export function MonitorPanel({ visible }: { visible: boolean }) {
   return (
     <div style={{ padding: "0 0 32px" }}>
       {data.error && (
-        <div style={{ padding: "8px 12px", marginBottom: 16, fontFamily: "var(--font-mono-stack)", fontSize: 12, color: "var(--accent-warn)", background: "rgba(184, 92, 40, 0.08)", border: "1px solid rgba(184, 92, 40, 0.2)" }}>
+        <div style={{ padding: "8px 12px", marginBottom: 16, fontFamily: "var(--font-sans-stack)", fontSize: 12, color: "var(--accent-warn)", background: "rgba(184, 92, 40, 0.08)", border: "1px solid rgba(184, 92, 40, 0.2)" }}>
           {data.error}
         </div>
       )}
@@ -39,7 +39,7 @@ export function MonitorPanel({ visible }: { visible: boolean }) {
               <div>
                 <span style={statLabel}>Containers</span>
                 <span style={{ ...statValue, color: "var(--accent-data)" }}>{data.health.data.containers.running}</span>
-                <span style={{ fontFamily: "var(--font-mono-stack)", fontSize: 12, color: "var(--muted)", marginLeft: 4 }}>running</span>
+                <span style={{ fontFamily: "var(--font-sans-stack)", fontSize: 12, color: "var(--muted)", marginLeft: 4 }}>running</span>
               </div>
               {data.uptime && (
                 <div>
@@ -61,7 +61,7 @@ export function MonitorPanel({ visible }: { visible: boolean }) {
               const usedGB = vol.usedBytes / (1024 ** 3);
               return (
                 <div key={vol.label} style={{ marginBottom: 8 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-mono-stack)", fontSize: 12, marginBottom: 4 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-sans-stack)", fontSize: 12, marginBottom: 4 }}>
                     <span>{vol.label}</span>
                     <span style={{ color: "var(--muted)" }}>{usedGB.toFixed(1)} / {totalGB.toFixed(1)} GB</span>
                   </div>
@@ -80,7 +80,7 @@ export function MonitorPanel({ visible }: { visible: boolean }) {
           <div>
             <span style={sectionLabel}>Providers</span>
             {data.healthcheck.data.providers.map((p) => (
-              <div key={p.providerId} style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "var(--font-mono-stack)", fontSize: 12, marginBottom: 4 }}>
+              <div key={p.providerId} style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "var(--font-sans-stack)", fontSize: 12, marginBottom: 4 }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: p.status === "up" ? "var(--accent-data)" : "var(--accent-warn)", flexShrink: 0 }} />
                 <span>{p.providerId}</span>
                 <span style={{ color: "var(--muted)" }}>{p.status}</span>

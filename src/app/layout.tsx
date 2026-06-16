@@ -1,18 +1,28 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-mono",
+const spaceGrotesk = localFont({
+  src: "../../public/fonts/SpaceGrotesk-VariableFont_wght.ttf",
+  variable: "--font-heading",
   display: "swap",
 });
 
-const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
+const inter = localFont({
+  src: [
+    { path: "../../public/fonts/Inter-VariableFont_opsz,wght.ttf", style: "normal" },
+    { path: "../../public/fonts/Inter-Italic-VariableFont_opsz,wght.ttf", style: "italic" },
+  ],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const jetbrainsMono = localFont({
+  src: [
+    { path: "../../public/fonts/JetBrainsMono-VariableFont_wght.ttf", style: "normal" },
+    { path: "../../public/fonts/JetBrainsMono-Italic-VariableFont_wght.ttf", style: "italic" },
+  ],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -41,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${ibmPlexMono.variable} ${ibmPlexSans.variable}`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body>{children}</body>
     </html>
   );

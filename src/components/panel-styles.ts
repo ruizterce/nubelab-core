@@ -18,8 +18,13 @@ export const card: CSSProperties = {
   padding: "8px 12px",
   background: "rgba(27, 77, 107, 0.04)",
   border: "1px solid var(--border-light)",
-  fontFamily: "var(--font-mono-stack)",
+  fontFamily: "var(--font-sans-stack)",
   fontSize: 13,
+};
+
+export const cardMono: CSSProperties = {
+  ...card,
+  fontFamily: "var(--font-mono-stack)",
 };
 
 export const iconBox: CSSProperties = {

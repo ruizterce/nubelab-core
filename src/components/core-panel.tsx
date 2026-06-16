@@ -54,7 +54,7 @@ export function CorePanel() {
       <StaggerFadeIn index={0}>
         <div style={{ marginBottom: 24 }}>
           <span style={sectionLabel}>About</span>
-          <p style={{ fontFamily: "var(--font-mono-stack)", fontSize: 13, lineHeight: 1.8, color: "var(--foreground)", margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-sans-stack)", fontSize: 13, lineHeight: 1.8, color: "var(--foreground)", margin: 0 }}>
             Multi-tenant cloud platform running on a Hetzner CPX22 VPS.
             Containerized apps orchestrated with Docker, connected via
             internal networks, and exposed through a central Caddy reverse proxy.
